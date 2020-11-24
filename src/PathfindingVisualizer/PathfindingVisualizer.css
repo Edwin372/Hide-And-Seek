@@ -1,0 +1,18 @@
+.grid {
+  margin: 100px 0 0;
+}
+button {
+  background: rgb(66, 87, 72);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  height: 40px;
+  width:  100px;
+  text-align: center;
+  outline: none;
+  cursor: pointer;
+  margin: 10px;
+}
+.row {
+  margin: -1px
+}

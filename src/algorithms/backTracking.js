@@ -1,0 +1,238 @@
+
+
+
+
+export function backTrack(grid, startNode, finishNode) {
+    // let stepX = [1,1,0,-1,-1,-1,0,1]
+    // let stepY = [0,1,1,1,0,-1,-1,-1]
+    var backTrackTour = []
+    if (findTarget(grid, startNode, finishNode, backTrackTour, 0)) {
+      console.log(backTrackTour)
+      return backTrackTour
+    } else {
+      return backTrackTour
+    }
+}
+
+const isSafe = (row, col) => {
+   if (row < 10 && col < 30 && row > 0 && col > 0) return true
+   return false
+}
+
+const getSeenNode = (currentNode, grid, signArr) => {
+    let output =[]
+    for (let i = 0; i < signArr.length; i++) {
+        if (isSafe(currentNode.row + signArr[i][0], currentNode.col + signArr[i][1])) {
+            let currentSeenNode = grid[currentNode.row + signArr[i][0]][currentNode.col + signArr[i][1]]
+            if (currentSeenNode) {
+                output.push(currentSeenNode)
+            }
+        }
+    }
+    return output
+}
+
+const getHeuristicPoint = (nextNode, signArr, currentNode, grid) => {
+    if ((nextNode && nextNode.isWall === true) || !nextNode ) {
+        return null
+    }
+    else {
+        if (currentNode) {
+            let seenNodes = getSeenNode(currentNode, grid, signArr)
+            let heuristicPoint = seenNodes.reduce((sum, seenNode) => sum + seenNode.point, 0)
+            return heuristicPoint
+        }
+    }
+}
+
+const getVision = (currentNode, grid) => {
+    let decisionQueue = []
+    let direction = {
+        'East': 0,
+        'EastNorth': 0,
+        'North': 0,
+        'WestNorth': 0,
+        'West': 0,
+        'WestSouth': 0,
+        'South': 0,
+        'EastSouth': 0,
+    }
+    for (let item in direction) {
+        switch (item) {
+            case 'East': 
+                let eastSignArr = [
+                    [0,2],
+                    [0,3],
+                    [-1,2],
+                    [-1,3],
+                    [-2,3],
+                    [0,1]
+                ]
+                if (isSafe(currentNode.row, currentNode.col + 1)) {
+                    let eastHeuristicPoint = getHeuristicPoint(grid[currentNode.row][currentNode.col + 1], eastSignArr, currentNode, grid)
+                    if (eastHeuristicPoint !== null) {
+                        decisionQueue.push([0 , 1, eastHeuristicPoint])
+                        break
+                    }
+                }
+                
+                break
+            case 'EastNorth': 
+                let eastNorthSignArr = [
+                    [-2,2],
+                    [-3,3],
+                    [-2,1],
+                    [-3,1],
+                    [-3,2],
+                    [-1,1]
+                ]
+                if (isSafe(currentNode.row - 1, currentNode.col + 1)) {
+                    let eastNorthHeuristicPoint = getHeuristicPoint(grid[currentNode.row - 1][currentNode.col + 1], eastNorthSignArr, currentNode, grid)
+                    if (eastNorthHeuristicPoint !== null) {
+                        decisionQueue.push([-1, 1, eastNorthHeuristicPoint])
+                        break
+                    }
+                }
+                
+                break
+            case 'North': 
+                let northSignArr = [
+                    [-2,0],
+                    [-3,0],
+                    [-2,-1],
+                    [-3,-1],
+                    [-3,-2],
+                    [-1,0]
+                ]
+                if (isSafe(currentNode.row - 1, currentNode.col )) {
+                    let northHeuristicPoint = getHeuristicPoint( grid[currentNode.row - 1][currentNode.col], northSignArr, currentNode, grid)
+                    if (northHeuristicPoint !== null) {
+                        decisionQueue.push([-1, 0, northHeuristicPoint])
+                        break
+                    }
+                }
+
+                break
+            case 'WestNorth': 
+                let westNorthSignArr = [
+                    [-2,-2],
+                    [-3,-3],
+                    [-1,-2],
+                    [-1,-3],
+                    [-2,-3],
+                    [-1,-1]
+                ]
+                if (isSafe(currentNode.row - 1, currentNode.col - 1)) {
+                    let westNorthHeuristicPoint = getHeuristicPoint(grid[currentNode.row - 1][currentNode.col - 1], westNorthSignArr, currentNode, grid)
+                    if (westNorthHeuristicPoint !== null) {
+                        decisionQueue.push([-1 , -1, westNorthHeuristicPoint])
+                        break
+                    }
+                }
+                break
+            case 'West': 
+                let westSignArr = [
+                    [0,-2],
+                    [0,-3],
+                    [1,-2],
+                    [1,-3],
+                    [2,-3],
+                    [0,-1]
+                ]
+                if (isSafe(currentNode.row, currentNode.col - 1)) {
+                    let westHeuristicPoint = getHeuristicPoint(grid[currentNode.row][currentNode.col - 1], westSignArr, currentNode, grid)
+                    if (westHeuristicPoint !== null) {
+                        decisionQueue.push([0 , -1, westHeuristicPoint])
+                        break
+                    }
+                }
+                
+                break
+            case 'WestSouth': 
+                let westSouthSignArr = [
+                    [2,-2],
+                    [3,-3],
+                    [2,-1],
+                    [3,-1],
+                    [3,-2],
+                    [1,-1]
+                ]
+                if (isSafe(currentNode.row + 1, currentNode.col - 1)) {
+                    let westSouthHeuristicPoint = getHeuristicPoint(grid[currentNode.row + 1 ][currentNode.col - 1], westSouthSignArr, currentNode, grid)
+                    if (westSouthHeuristicPoint !== null) {
+                        decisionQueue.push([ 1, -1, westSouthHeuristicPoint])
+                        break
+                    }
+                }
+                
+                break
+            case 'South': 
+                let southSignArr = [
+                    [2,0],
+                    [3,0],
+                    [2,1],
+                    [3,1],
+                    [3,2],
+                    [1,0]
+                ]
+                if (isSafe(currentNode.row + 1, currentNode.col)) {
+                    let southHeuristicPoint = getHeuristicPoint(grid[currentNode.row + 1][currentNode.col], southSignArr, currentNode, grid)
+                    if (southHeuristicPoint !== null) {
+                        decisionQueue.push([1, 0, southHeuristicPoint])
+                        break
+                    }
+                }
+                
+                break
+            case 'EastSouth': 
+                let eastSouthSignArr = [
+                    [2,2],
+                    [3,3],
+                    [1,2],
+                    [1,3],
+                    [2,3],
+                    [1,1]
+                ]
+                if (isSafe(currentNode.row + 1, currentNode.col + 1)) {
+                    let eastSouthHeuristicPoint = getHeuristicPoint(grid[currentNode.row + 1][currentNode.col + 1], eastSouthSignArr, currentNode, grid)
+                    if (eastSouthHeuristicPoint !== null) {
+                        decisionQueue.push([ 1, 1, eastSouthHeuristicPoint])
+                        break
+                    }
+                }
+                
+                break
+            default: break
+        }
+    }
+    return decisionQueue.sort((item1, item2) => (item1[2] > item2[2]) ? -1 :  ((item1[2] < item2[2])? 1 : 0))
+}
+
+const findTarget = (grid, currentNode, finishNode, backTrackTour, stepCount) => {
+    if ((finishNode.col === currentNode.col && finishNode.row === currentNode.row )||stepCount  === 30 * 10) {
+        backTrackTour.push(finishNode)
+        finishNode.isVisited = true
+        return backTrackTour
+    }
+    let decisionQueue = getVision(currentNode, grid)
+    console.log(decisionQueue)
+    backTrackTour.push(currentNode)
+    currentNode.isVisited = true
+    for (let i = 0; i < decisionQueue.length; i++) {
+        let nextNodeCol = currentNode.col + decisionQueue[i][1]
+        let nextNodeRow = currentNode.row + decisionQueue[i][0]
+        if (
+            nextNodeRow >= 0 && 
+            nextNodeCol >= 0  && 
+            nextNodeRow < 10 && 
+            nextNodeCol < 30 &&
+            grid[nextNodeRow][nextNodeCol].isVisited !== true && 
+            grid[nextNodeRow][nextNodeCol].isWall !== true
+        ) {
+            let nextNode = grid[nextNodeRow][nextNodeCol]
+            if(findTarget(grid, nextNode, finishNode, backTrackTour, stepCount + 1)) return backTrackTour
+            backTrackTour.push(currentNode)
+        }
+    }
+    // return backTrackTour
+}
