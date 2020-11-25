@@ -1,9 +1,8 @@
-import React, {Component} from 'react';
-import Node from './Node/Node';
-import {backTrack, isSafe} from '../algorithms/backTracking'
-import './PathfindingVisualizer.css';
-
-
+import React, { Component } from "react";
+import Node from "./Node/Node";
+import { backTrack, isSafe } from "../algorithms/backTracking";
+import "./PathfindingVisualizer.css";
+import reader from "../helper/inputFromText.js";
 
 export default class PathfindingVisualizer extends Component {
   constructor() {
@@ -23,70 +22,126 @@ export default class PathfindingVisualizer extends Component {
 
   componentDidMount() {
     const grid = this.getInitialGrid();
-    this.setState({grid});
+    this.setState({ grid });
   }
 
   handleMouseDown(row, col) {
     const newGrid = this.getNewGridWithWallToggled(this.state.grid, row, col);
     console.log(newGrid);
-    this.setState({grid: newGrid, mouseIsPressed: true});
+    this.setState({ grid: newGrid, mouseIsPressed: true });
   }
 
   handleMouseEnter(row, col) {
     // console.log('handle mouse entered', row, col)
     if (!this.state.mouseIsPressed) return;
     const newGrid = this.getNewGridWithWallToggled(this.state.grid, row, col);
-    this.setState({grid: newGrid});
+    this.setState({ grid: newGrid });
   }
 
   handleMouseUp() {
-    this.setState({mouseIsPressed: false});
+    this.setState({ mouseIsPressed: false });
   }
 
-
   animateVision(node, prevNode) {
-    let visionX = [1,1,0,0,-1,-1,1,-1,2,2,0,0,-2,-2,2,-2,1,-1,2,2,-2,-2,1,-1]
-    let visionY = [1,-1,1,-1,1,-1,0,0,2,-2,2,-2,2,-2,0,0,2,2,1,-1,1,-1,-2,-2]
-    for (let i = 0; i < 24 ; i ++ ) {
-      let visionNode = document.getElementById(`node-${node.row + visionX[i]}-${node.col + visionY[i]}`)
+    let visionX = [
+      1,
+      1,
+      0,
+      0,
+      -1,
+      -1,
+      1,
+      -1,
+      2,
+      2,
+      0,
+      0,
+      -2,
+      -2,
+      2,
+      -2,
+      1,
+      -1,
+      2,
+      2,
+      -2,
+      -2,
+      1,
+      -1,
+    ];
+    let visionY = [
+      1,
+      -1,
+      1,
+      -1,
+      1,
+      -1,
+      0,
+      0,
+      2,
+      -2,
+      2,
+      -2,
+      2,
+      -2,
+      0,
+      0,
+      2,
+      2,
+      1,
+      -1,
+      1,
+      -1,
+      -2,
+      -2,
+    ];
+    for (let i = 0; i < 24; i++) {
+      let visionNode = document.getElementById(
+        `node-${node.row + visionX[i]}-${node.col + visionY[i]}`
+      );
 
       if (visionNode) {
-        visionNode.className = 'node node-vision'
+        visionNode.className = "node node-vision";
       }
     }
   }
   animateBackTrackTour(backTrackTour) {
     for (let i = 1; i <= backTrackTour.length; i++) {
       if (i === backTrackTour.length) {
-       
-      }
-      else {
+      } else {
         const node = backTrackTour[i];
-        const prevNode = backTrackTour[i-1];
+        const prevNode = backTrackTour[i - 1];
 
         setTimeout(() => {
-          let currentNodeElement = document.getElementById(`node-${node.row}-${node.col}`)
-          let prevNodeElement = document.getElementById(`node-${prevNode.row}-${prevNode.col}`)
-          currentNodeElement.className = 'node node-start';
-          currentNodeElement.childNodes[0].className = 'seen'
-          prevNodeElement.className = 'node node-visited';
-          prevNodeElement.childNodes[0].className = 'unseen'
+          let currentNodeElement = document.getElementById(
+            `node-${node.row}-${node.col}`
+          );
+          let prevNodeElement = document.getElementById(
+            `node-${prevNode.row}-${prevNode.col}`
+          );
+          currentNodeElement.className = "node node-start";
+          currentNodeElement.childNodes[0].className = "seen";
+          prevNodeElement.className = "node node-visited";
+          prevNodeElement.childNodes[0].className = "unseen";
         }, 200 * i);
       }
     }
   }
 
   visualizeBackTracking() {
-
-    const {grid, startNodeRow, startNodeCol, finishNodeRow, finishNodeCol} = this.state;
-    this.setState({gameStarted: true})
+    const {
+      grid,
+      startNodeRow,
+      startNodeCol,
+      finishNodeRow,
+      finishNodeCol,
+    } = this.state;
+    this.setState({ gameStarted: true });
     const startNode = grid[startNodeRow][startNodeCol];
     const finishNode = grid[finishNodeRow][finishNodeCol];
     const backTrackTour = backTrack(grid, startNode, finishNode);
-    this.animateBackTrackTour(backTrackTour)
+    this.animateBackTrackTour(backTrackTour);
   }
-
- 
 
   getInitialGrid = () => {
     const grid = [];
@@ -100,30 +155,38 @@ export default class PathfindingVisualizer extends Component {
     return grid;
   };
 
-
-
   createNode = (col, row) => {
-    const { startNodeRow, startNodeCol, finishNodeRow, finishNodeCol, finishNodeRow1, finishNodeCol1} = this.state;
+    const {
+      startNodeRow,
+      startNodeCol,
+      finishNodeRow,
+      finishNodeCol,
+      finishNodeRow1,
+      finishNodeCol1,
+    } = this.state;
     return {
       col,
       row,
       isStart: row === startNodeRow && col === startNodeCol,
-      isFinish: (row === finishNodeRow && col === finishNodeCol) || (row === finishNodeRow1 && col === finishNodeCol1),
+      isFinish:
+        (row === finishNodeRow && col === finishNodeCol) ||
+        (row === finishNodeRow1 && col === finishNodeCol1),
       distance: Infinity,
       isVisited: false,
       isWall: false,
       previousNode: null,
-      point: 
-      (row === finishNodeRow && col === finishNodeCol) || (row === finishNodeRow1 && col === finishNodeCol1)
-      ? 2000 
-      : 0
+      point:
+        (row === finishNodeRow && col === finishNodeCol) ||
+        (row === finishNodeRow1 && col === finishNodeCol1)
+          ? 2000
+          : 0,
     };
   };
 
   getNewGridWithWallToggled = (grid, row, col) => {
     const newGrid = grid.slice();
-    let stepX = [1,1,0,-1,-1,-1,0,1]
-    let stepY = [0,1,1,1,0,-1,-1,-1]
+    let stepX = [1, 1, 0, -1, -1, -1, 0, 1];
+    let stepY = [0, 1, 1, 1, 0, -1, -1, -1];
     const node = newGrid[row][col];
     const newNode = {
       ...node,
@@ -133,10 +196,10 @@ export default class PathfindingVisualizer extends Component {
     for (let i = 0; i < 8; i++) {
       if (isSafe(row + stepY[i], col + stepX[i])) {
         const nextNode = newGrid[row + stepY[i]][col + stepX[i]];
-        const affectedNode =  {
+        const affectedNode = {
           ...nextNode,
-          point: nextNode.point + 1
-        }
+          point: nextNode.point + 1,
+        };
         newGrid[row + stepY[i]][col + stepX[i]] = affectedNode;
       }
     }
@@ -145,19 +208,18 @@ export default class PathfindingVisualizer extends Component {
   };
 
   render() {
-    const {grid, mouseIsPressed, gameStarted} = this.state;
+    const { grid, mouseIsPressed, gameStarted } = this.state;
 
     return (
       <>
-        <button onClick={() => this.visualizeBackTracking()}>
-          Visualize!
-        </button>
+        <button onClick={() => this.visualizeBackTracking()}>Visualize!</button>
+        <input type="file" onChange={(e) => reader(e)}></input>
         <div className="grid">
           {grid.map((row, rowIdx) => {
             return (
               <div key={rowIdx} className="row">
                 {row.map((node, nodeIdx) => {
-                  const {row, col, isFinish, isStart, isWall} = node;
+                  const { row, col, isFinish, isStart, isWall } = node;
                   return (
                     <Node
                       key={nodeIdx}
@@ -172,7 +234,8 @@ export default class PathfindingVisualizer extends Component {
                         this.handleMouseEnter(row, col)
                       }
                       onMouseUp={() => this.handleMouseUp()}
-                      row={row}></Node>
+                      row={row}
+                    ></Node>
                   );
                 })}
               </div>
@@ -183,4 +246,3 @@ export default class PathfindingVisualizer extends Component {
     );
   }
 }
-
