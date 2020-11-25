@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import Node from './Node/Node';
-import {backTrack} from '../algorithms/backTracking'
+import {backTrack, isSafe} from '../algorithms/backTracking'
 import './PathfindingVisualizer.css';
 
 
@@ -12,7 +12,7 @@ export default class PathfindingVisualizer extends Component {
       grid: [],
       startNodeRow: 5,
       startNodeCol: 5,
-      finishNodeRow: 5,
+      finishNodeRow: 9,
       finishNodeCol: 20,
       mouseIsPressed: false,
     };
@@ -25,6 +25,7 @@ export default class PathfindingVisualizer extends Component {
 
   handleMouseDown(row, col) {
     const newGrid = this.getNewGridWithWallToggled(this.state.grid, row, col);
+    console.log(newGrid);
     this.setState({grid: newGrid, mouseIsPressed: true});
   }
 
@@ -108,19 +109,31 @@ export default class PathfindingVisualizer extends Component {
       previousNode: null,
       point: 
       (row === finishNodeRow && col === finishNodeCol) 
-      ? 20 
+      ? 2000 
       : 0
     };
   };
 
   getNewGridWithWallToggled = (grid, row, col) => {
     const newGrid = grid.slice();
+    let stepX = [1,1,0,-1,-1,-1,0,1]
+    let stepY = [0,1,1,1,0,-1,-1,-1]
     const node = newGrid[row][col];
     const newNode = {
       ...node,
       isWall: !node.isWall,
-      point: 1
+      // point: 0
     };
+    for (let i = 0; i < 8; i++) {
+      if (isSafe(row + stepY[i], col + stepX[i])) {
+        const nextNode = newGrid[row + stepY[i]][col + stepX[i]];
+        const affectedNode =  {
+          ...nextNode,
+          point: nextNode.point + 1
+        }
+        newGrid[row + stepY[i]][col + stepX[i]] = affectedNode;
+      }
+    }
     newGrid[row][col] = newNode;
     return newGrid;
   };

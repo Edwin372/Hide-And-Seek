@@ -1,10 +1,7 @@
-
-
-
-
+let stepX = [1,1,0,-1,-1,-1,0,1]
+let stepY = [0,1,1,1,0,-1,-1,-1]
 export function backTrack(grid, startNode, finishNode) {
-    // let stepX = [1,1,0,-1,-1,-1,0,1]
-    // let stepY = [0,1,1,1,0,-1,-1,-1]
+  
     var backTrackTour = []
     if (findTarget(grid, startNode, finishNode, backTrackTour, 0)) {
       console.log(backTrackTour)
@@ -14,8 +11,8 @@ export function backTrack(grid, startNode, finishNode) {
     }
 }
 
-const isSafe = (row, col) => {
-   if (row < 10 && col < 30 && row > 0 && col > 0) return true
+export const isSafe = (row, col) => {
+   if (row < 10 && col < 30 && row >= 0 && col >= 0) return true
    return false
 }
 
@@ -32,6 +29,17 @@ const getSeenNode = (currentNode, grid, signArr) => {
     return output
 }
 
+const effectEachMove = (currentNode,grid)  => {
+    
+    currentNode.isVisited = true
+    currentNode.point -=1
+    for (let i = 0; i < 8; i++) {
+        if (isSafe(currentNode.row + stepY[i], currentNode.col + stepX[i])) {
+          const nextNode = grid[currentNode.row + stepY[i]][currentNode.col + stepX[i]];
+          nextNode.point -=1
+        }
+    }
+}
 const getHeuristicPoint = (nextNode, signArr, currentNode, grid) => {
     if ((nextNode && nextNode.isWall === true) || !nextNode ) {
         return null
@@ -39,6 +47,9 @@ const getHeuristicPoint = (nextNode, signArr, currentNode, grid) => {
     else {
         if (currentNode) {
             let seenNodes = getSeenNode(currentNode, grid, signArr)
+            // if (seenNodes.find(node => node.point > 0)) {
+            //     seenNodes = seenNodes.filter(node => node.point > 0)
+            // }
             let heuristicPoint = seenNodes.reduce((sum, seenNode) => sum + seenNode.point, 0)
             return heuristicPoint
         }
@@ -66,6 +77,9 @@ const getVision = (currentNode, grid) => {
                     [-1,2],
                     [-1,3],
                     [-2,3],
+                    [1,2],
+                    [1,3],
+                    [2,3],
                     [0,1]
                 ]
                 if (isSafe(currentNode.row, currentNode.col + 1)) {
@@ -84,7 +98,10 @@ const getVision = (currentNode, grid) => {
                     [-2,1],
                     [-3,1],
                     [-3,2],
-                    [-1,1]
+                    [-1,1],
+                    [-1,2],
+                    [-1,3],
+                    [-2,3],
                 ]
                 if (isSafe(currentNode.row - 1, currentNode.col + 1)) {
                     let eastNorthHeuristicPoint = getHeuristicPoint(grid[currentNode.row - 1][currentNode.col + 1], eastNorthSignArr, currentNode, grid)
@@ -102,6 +119,9 @@ const getVision = (currentNode, grid) => {
                     [-2,-1],
                     [-3,-1],
                     [-3,-2],
+                    [-2,1],
+                    [-3,1],
+                    [-3,2],
                     [-1,0]
                 ]
                 if (isSafe(currentNode.row - 1, currentNode.col )) {
@@ -120,6 +140,9 @@ const getVision = (currentNode, grid) => {
                     [-1,-2],
                     [-1,-3],
                     [-2,-3],
+                    [-2,-1],
+                    [-3,-1],
+                    [-3,-2],
                     [-1,-1]
                 ]
                 if (isSafe(currentNode.row - 1, currentNode.col - 1)) {
@@ -137,6 +160,9 @@ const getVision = (currentNode, grid) => {
                     [1,-2],
                     [1,-3],
                     [2,-3],
+                    [-1,-2],
+                    [-1,-3],
+                    [-2,-3],
                     [0,-1]
                 ]
                 if (isSafe(currentNode.row, currentNode.col - 1)) {
@@ -155,6 +181,9 @@ const getVision = (currentNode, grid) => {
                     [2,-1],
                     [3,-1],
                     [3,-2],
+                    [1,-2],
+                    [1,-3],
+                    [2,-3],
                     [1,-1]
                 ]
                 if (isSafe(currentNode.row + 1, currentNode.col - 1)) {
@@ -173,6 +202,9 @@ const getVision = (currentNode, grid) => {
                     [2,1],
                     [3,1],
                     [3,2],
+                    [2,-1],
+                    [3,-1],
+                    [3,-2],
                     [1,0]
                 ]
                 if (isSafe(currentNode.row + 1, currentNode.col)) {
@@ -191,6 +223,9 @@ const getVision = (currentNode, grid) => {
                     [1,2],
                     [1,3],
                     [2,3],
+                    [2,1],
+                    [3,1],
+                    [3,2],
                     [1,1]
                 ]
                 if (isSafe(currentNode.row + 1, currentNode.col + 1)) {
@@ -200,11 +235,11 @@ const getVision = (currentNode, grid) => {
                         break
                     }
                 }
-                
                 break
             default: break
         }
     }
+    decisionQueue.filter(item => item[2] >= 0)
     return decisionQueue.sort((item1, item2) => (item1[2] > item2[2]) ? -1 :  ((item1[2] < item2[2])? 1 : 0))
 }
 
@@ -214,10 +249,10 @@ const findTarget = (grid, currentNode, finishNode, backTrackTour, stepCount) => 
         finishNode.isVisited = true
         return backTrackTour
     }
-    let decisionQueue = getVision(currentNode, grid)
+    let decisionQueue = getVision(currentNode, grid).filter(item => item[2] > -10)
     console.log(decisionQueue)
     backTrackTour.push(currentNode)
-    currentNode.isVisited = true
+    effectEachMove(currentNode, grid)
     for (let i = 0; i < decisionQueue.length; i++) {
         let nextNodeCol = currentNode.col + decisionQueue[i][1]
         let nextNodeRow = currentNode.row + decisionQueue[i][0]
