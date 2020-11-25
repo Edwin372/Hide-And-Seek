@@ -9,6 +9,7 @@ export default class PathfindingVisualizer extends Component {
   constructor() {
     super();
     this.state = {
+      gameStarted: false,
       grid: [],
       startNodeRow: 5,
       startNodeCol: 5,
@@ -60,20 +61,23 @@ export default class PathfindingVisualizer extends Component {
       else {
         const node = backTrackTour[i];
         const prevNode = backTrackTour[i-1];
+
         setTimeout(() => {
-          document.getElementById(`node-${node.row}-${node.col}`).className =
-            'node node-start';
-         
-          // this.animateVision(node, prevNode)
-          document.getElementById(`node-${prevNode.row}-${prevNode.col}`).className =
-          'node node-visited';
+          let currentNodeElement = document.getElementById(`node-${node.row}-${node.col}`)
+          let prevNodeElement = document.getElementById(`node-${prevNode.row}-${prevNode.col}`)
+          currentNodeElement.className = 'node node-start';
+          currentNodeElement.childNodes[0].className = 'seen'
+          prevNodeElement.className = 'node node-visited';
+          prevNodeElement.childNodes[0].className = 'unseen'
         }, 200 * i);
       }
     }
   }
 
   visualizeBackTracking() {
+
     const {grid, startNodeRow, startNodeCol, finishNodeRow, finishNodeCol} = this.state;
+    this.setState({gameStarted: true})
     const startNode = grid[startNodeRow][startNodeCol];
     const finishNode = grid[finishNodeRow][finishNodeCol];
     const backTrackTour = backTrack(grid, startNode, finishNode);
@@ -139,7 +143,7 @@ export default class PathfindingVisualizer extends Component {
   };
 
   render() {
-    const {grid, mouseIsPressed} = this.state;
+    const {grid, mouseIsPressed, gameStarted} = this.state;
 
     return (
       <>
@@ -160,6 +164,7 @@ export default class PathfindingVisualizer extends Component {
                       isStart={isStart}
                       isWall={isWall}
                       mouseIsPressed={mouseIsPressed}
+                      gameStarted={gameStarted}
                       onMouseDown={(row, col) => this.handleMouseDown(row, col)}
                       onMouseEnter={(row, col) =>
                         this.handleMouseEnter(row, col)

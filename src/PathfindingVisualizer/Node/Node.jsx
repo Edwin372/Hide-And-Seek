@@ -13,6 +13,7 @@ export default class Node extends Component {
       onMouseEnter,
       onMouseUp,
       row,
+      gameStarted
     } = this.props;
     const extraClassName = isFinish
       ? 'node-finish'
@@ -28,7 +29,11 @@ export default class Node extends Component {
         className={`node ${extraClassName}`}
         onMouseDown={() => onMouseDown(row, col)}
         onMouseEnter={() => onMouseEnter(row, col)}
-        onMouseUp={() => onMouseUp()}></div>
+        onMouseUp={() => onMouseUp()}>
+          {
+            gameStarted ?  <div className={extraClassName === 'node-start'? 'seen' :'unseen'}></div>: null
+          }
+        </div>
     );
   }
 }

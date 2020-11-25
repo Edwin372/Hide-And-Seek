@@ -250,7 +250,7 @@ const findTarget = (grid, currentNode, finishNode, backTrackTour, stepCount) => 
         return backTrackTour
     }
     let decisionQueue = getVision(currentNode, grid).filter(item => item[2] > -10)
-    console.log(decisionQueue)
+    // console.log(decisionQueue)
     backTrackTour.push(currentNode)
     effectEachMove(currentNode, grid)
     for (let i = 0; i < decisionQueue.length; i++) {
