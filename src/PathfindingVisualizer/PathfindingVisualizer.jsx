@@ -15,6 +15,8 @@ export default class PathfindingVisualizer extends Component {
       startNodeCol: 5,
       finishNodeRow: 9,
       finishNodeCol: 20,
+      finishNodeRow1: 5,
+      finishNodeCol1: 20,
       mouseIsPressed: false,
     };
   }
@@ -101,18 +103,18 @@ export default class PathfindingVisualizer extends Component {
 
 
   createNode = (col, row) => {
-    const { startNodeRow, startNodeCol, finishNodeRow, finishNodeCol} = this.state;
+    const { startNodeRow, startNodeCol, finishNodeRow, finishNodeCol, finishNodeRow1, finishNodeCol1} = this.state;
     return {
       col,
       row,
       isStart: row === startNodeRow && col === startNodeCol,
-      isFinish: row === finishNodeRow && col === finishNodeCol,
+      isFinish: (row === finishNodeRow && col === finishNodeCol) || (row === finishNodeRow1 && col === finishNodeCol1),
       distance: Infinity,
       isVisited: false,
       isWall: false,
       previousNode: null,
       point: 
-      (row === finishNodeRow && col === finishNodeCol) 
+      (row === finishNodeRow && col === finishNodeCol) || (row === finishNodeRow1 && col === finishNodeCol1)
       ? 2000 
       : 0
     };

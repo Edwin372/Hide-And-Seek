@@ -3,7 +3,7 @@ let stepY = [0,1,1,1,0,-1,-1,-1]
 export function backTrack(grid, startNode, finishNode) {
   
     var backTrackTour = []
-    if (findTarget(grid, startNode, finishNode, backTrackTour, 0)) {
+    if (findTarget(grid, startNode, backTrackTour, 0, 2)) {
       console.log(backTrackTour)
       return backTrackTour
     } else {
@@ -243,14 +243,19 @@ const getVision = (currentNode, grid) => {
     return decisionQueue.sort((item1, item2) => (item1[2] > item2[2]) ? -1 :  ((item1[2] < item2[2])? 1 : 0))
 }
 
-const findTarget = (grid, currentNode, finishNode, backTrackTour, stepCount) => {
-    if ((finishNode.col === currentNode.col && finishNode.row === currentNode.row )||stepCount  === 30 * 10) {
-        backTrackTour.push(finishNode)
-        finishNode.isVisited = true
+const findTarget = (grid, currentNode, backTrackTour, stepCount, remainingHider) => {
+    if (remainingHider === 0 ) {
+         console.log(remainingHider)
         return backTrackTour
     }
+    if (currentNode.isFinish || stepCount  === 30 * 10) {
+        remainingHider -= 1
+        console.log(remainingHider)
+        backTrackTour.push(currentNode)
+        currentNode.isVisited = true
+        // return backTrackTour
+    }
     let decisionQueue = getVision(currentNode, grid).filter(item => item[2] > -10)
-    // console.log(decisionQueue)
     backTrackTour.push(currentNode)
     effectEachMove(currentNode, grid)
     for (let i = 0; i < decisionQueue.length; i++) {
@@ -264,8 +269,9 @@ const findTarget = (grid, currentNode, finishNode, backTrackTour, stepCount) => 
             grid[nextNodeRow][nextNodeCol].isVisited !== true && 
             grid[nextNodeRow][nextNodeCol].isWall !== true
         ) {
+            
             let nextNode = grid[nextNodeRow][nextNodeCol]
-            if(findTarget(grid, nextNode, finishNode, backTrackTour, stepCount + 1)) return backTrackTour
+            if(findTarget(grid, nextNode, backTrackTour, stepCount + 1, remainingHider)) return backTrackTour
             backTrackTour.push(currentNode)
         }
     }
