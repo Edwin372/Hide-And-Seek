@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import Node from "./Node/Node";
 import { backTrack, isSafe } from "../algorithms/backTracking";
 import "./PathfindingVisualizer.css";
-import reader from "../helper/inputFromText.js";
+import dropHandler from "../helper/inputFromText.js";
 
 export default class PathfindingVisualizer extends Component {
   constructor() {
@@ -10,20 +10,15 @@ export default class PathfindingVisualizer extends Component {
     this.state = {
       gameStarted: false,
       grid: [],
-      startNodeRow: 5,
-      startNodeCol: 5,
-      finishNodeRow: 9,
-      finishNodeCol: 20,
-      finishNodeRow1: 5,
-      finishNodeCol1: 20,
       mouseIsPressed: false,
     };
   }
-
-  componentDidMount() {
-    const grid = this.getInitialGrid();
+  inputFromTextFile = (e) => {
+    let inputData = dropHandler(e);
+    console.log("abc ", inputData);
+    const grid = this.getInitialGrid(inputData);
     this.setState({ grid });
-  }
+  };
 
   handleMouseDown(row, col) {
     const newGrid = this.getNewGridWithWallToggled(this.state.grid, row, col);
@@ -40,70 +35,6 @@ export default class PathfindingVisualizer extends Component {
 
   handleMouseUp() {
     this.setState({ mouseIsPressed: false });
-  }
-
-  animateVision(node, prevNode) {
-    let visionX = [
-      1,
-      1,
-      0,
-      0,
-      -1,
-      -1,
-      1,
-      -1,
-      2,
-      2,
-      0,
-      0,
-      -2,
-      -2,
-      2,
-      -2,
-      1,
-      -1,
-      2,
-      2,
-      -2,
-      -2,
-      1,
-      -1,
-    ];
-    let visionY = [
-      1,
-      -1,
-      1,
-      -1,
-      1,
-      -1,
-      0,
-      0,
-      2,
-      -2,
-      2,
-      -2,
-      2,
-      -2,
-      0,
-      0,
-      2,
-      2,
-      1,
-      -1,
-      1,
-      -1,
-      -2,
-      -2,
-    ];
-    for (let i = 0; i < 24; i++) {
-      let visionNode = document.getElementById(
-        `node-${node.row + visionX[i]}-${node.col + visionY[i]}`
-      );
-
-      if (visionNode) {
-        visionNode.className = "node node-vision";
-      }
-    }
   }
   animateBackTrackTour(backTrackTour) {
     for (let i = 1; i <= backTrackTour.length; i++) {
@@ -143,44 +74,53 @@ export default class PathfindingVisualizer extends Component {
     this.animateBackTrackTour(backTrackTour);
   }
 
-  getInitialGrid = () => {
-    const grid = [];
-    for (let row = 0; row < 10; row++) {
-      const currentRow = [];
-      for (let col = 0; col < 30; col++) {
-        currentRow.push(this.createNode(col, row));
-      }
-      grid.push(currentRow);
-    }
+  getInitialGrid = (inputData) => {
+    let grid = inputData;
+    console.log("123 ", inputData.length);
+    // for (let row = 0; row < inputData.length; row++) {
+    // let currentRow = [];
+    // for (let col = 0; col < inputData[row].length; col++) {
+    // currentRow.push(this.createNode(col, row, inputData[row][col]));
+    // }
+    // grid.push(currentRow);
+    // }
+    console.log("tester ", grid[0]);
     return grid;
   };
 
-  createNode = (col, row) => {
-    const {
-      startNodeRow,
-      startNodeCol,
-      finishNodeRow,
-      finishNodeCol,
-      finishNodeRow1,
-      finishNodeCol1,
-    } = this.state;
-    return {
+  createNode = (col, row, nodeType) => {
+    let node = {
       col,
       row,
-      isStart: row === startNodeRow && col === startNodeCol,
-      isFinish:
-        (row === finishNodeRow && col === finishNodeCol) ||
-        (row === finishNodeRow1 && col === finishNodeCol1),
-      distance: Infinity,
+      isStart: false,
+      isFinish: false,
       isVisited: false,
       isWall: false,
       previousNode: null,
-      point:
-        (row === finishNodeRow && col === finishNodeCol) ||
-        (row === finishNodeRow1 && col === finishNodeCol1)
-          ? 2000
-          : 0,
+      point: 0,
     };
+    switch (nodeType) {
+      case 0:
+        return node;
+      case 1:
+        return {
+          ...node,
+          isWall: true,
+        };
+      case 2:
+        return {
+          ...node,
+          isStart: true,
+        };
+      case 3:
+        return {
+          ...node,
+          isFinish: true,
+          point: 100000,
+        };
+      default:
+        break;
+    }
   };
 
   getNewGridWithWallToggled = (grid, row, col) => {
@@ -213,7 +153,7 @@ export default class PathfindingVisualizer extends Component {
     return (
       <>
         <button onClick={() => this.visualizeBackTracking()}>Visualize!</button>
-        <input type="file" onChange={(e) => reader(e)}></input>
+        <input type="file" onChange={(e) => this.inputFromTextFile(e)}></input>
         <div className="grid">
           {grid.map((row, rowIdx) => {
             return (

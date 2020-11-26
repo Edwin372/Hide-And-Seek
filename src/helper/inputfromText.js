@@ -1,7 +1,9 @@
-export default function dropHandler(evt) {
+export default  function dropHandler(evt) {
+    var inputData = [];
+    var inputMN = []
+    console.log(typeof inputData)
     evt.stopPropagation();
     evt.preventDefault();
-    console.log(evt);
     // FileList object.
     var files = evt.target.files;
  
@@ -12,42 +14,39 @@ export default function dropHandler(evt) {
  
     var fileReader = new FileReader();
  
-    fileReader.onloadstart = function(progressEvent) {
-        console.log('onloadstart');
-        console.log('File name:' + file.name);
+    fileReader.onloadstart =  function(progressEvent) {
+        // console.log('onloadstart');
+        // console.log('File name:' + file.name);
     }
  
-    fileReader.onload = function(progressEvent) {
-        console.log("onload!");
+    fileReader.onload =  function(progressEvent) {
+        // console.log("onload!");
         var stringData = fileReader.result;
         
-        console.log(" ---------------- File Content ----------------: ");
-        console.log(stringData.split('\n'));
-        const str = stringData.split('\n');
-        console.log(str[0])
-        const strMN = str[0].split(' ');
-        console.log(strMN);
-        const inputMN = strMN.map(x => parseInt(x));
-        console.log(inputMN)
-        let matrix = []
+        // console.log(" ---------------- File Content ----------------: ");
+        // console.log(stringData.split('\n'));
+        let str = stringData.split('\n');
+        // console.log(str[0])
+        inputMN = inputMN + str[0].split(' ').map(x=> parseInt(x));
         for(let i=0;i<inputMN[0];i++){
-            const inputLine = str[i+1].split(' ').map(x => parseInt(x))
-            matrix.push(inputLine);
+            let inputLine = str[i+1].split(' ').map(x => parseInt(x))
+            inputData.push(inputLine);
         }
-        console.log(matrix);
+        console.log(inputData[0],'1234')
     }
- 
-    fileReader.onloadend = function(progressEvent) {
-        console.log("onloadend!");
+
+    fileReader.onloadend =  function(progressEvent) {
+        // console.log("onloadend!");
         // FileReader.EMPTY, FileReader.LOADING, FileReader.DONE
-        console.log("readyState = " + fileReader.readyState);
+        // console.log("readyState = " + fileReader.readyState);
     }
  
-    fileReader.onerror = function(progressEvent) {
-        console.log("onerror!");
-        console.log("Has Error!");
+    fileReader.onerror =  function(progressEvent) {
+        // console.log("onerror!");
+        // console.log("Has Error!");
     }
  
-    // Read file asynchronously.
+    console.log(inputData.length)
     fileReader.readAsText(file, "UTF-8"); // fileReader.result -> String.
+    return inputData;
 }
