@@ -1,9 +1,8 @@
-import React, {Component} from 'react';
-import Node from './Node/Node';
-import {backTrack, isSafe} from '../algorithms/backTracking'
-import './PathfindingVisualizer.css';
-
-
+import React, { Component } from "react";
+import Node from "./Node/Node";
+import { backTrack } from "../algorithms/backTracking";
+import "./PathfindingVisualizer.css";
+// import dropHandler from "../helper/inputfromText";
 
 export default class PathfindingVisualizer extends Component {
   constructor() {
@@ -11,153 +10,181 @@ export default class PathfindingVisualizer extends Component {
     this.state = {
       gameStarted: false,
       grid: [],
-      startNodeRow: 5,
-      startNodeCol: 5,
-      finishNodeRow: 9,
-      finishNodeCol: 20,
-      finishNodeRow1: 5,
-      finishNodeCol1: 20,
       mouseIsPressed: false,
+      inputData: [],
+      startNodeRow: 0,
+      startNodeCol: 0,
+      finishNodeRow: 0,
+      finishNodeCol: 0,
+      maxRow: 0,
+      maxCol: 0
     };
   }
-
-  componentDidMount() {
-    const grid = this.getInitialGrid();
-    this.setState({grid});
+  readFromTxtFile = (evt) => {
+    var inputData = [];
+    var inputMN = []
+    evt.stopPropagation();
+    evt.preventDefault();
+    var files = evt.target.files;
+ 
+    if (files.length !== 1) {
+        return;
+    }
+    var file = files[0];
+    var fileReader = new FileReader();
+ 
+    fileReader.onload =  (progressEvent) => {
+        var stringData = fileReader.result;
+        let str = stringData.split('\n');
+        inputMN = str[0].split(' ').map(x=> parseInt(x));
+        for(let i=0;i<inputMN[0];i++){
+            let inputLine = str[i+1].split(' ').map(x => parseInt(x))
+            inputData.push(inputLine);
+        }
+        this.setState({inputData}, () => {
+          this.setState({maxRow: inputMN[0], maxCol: inputMN[1]}, () => {
+            const grid = this.getInitialGrid(inputData);
+            this.setState({ grid });
+          })
+        })
+    }
+    fileReader.readAsText(file, "UTF-8"); // fileReader.result -> String.
   }
+  
+
 
   handleMouseDown(row, col) {
     const newGrid = this.getNewGridWithWallToggled(this.state.grid, row, col);
-    console.log(newGrid);
-    this.setState({grid: newGrid, mouseIsPressed: true});
+    this.setState({ grid: newGrid, mouseIsPressed: true });
   }
 
   handleMouseEnter(row, col) {
     // console.log('handle mouse entered', row, col)
     if (!this.state.mouseIsPressed) return;
     const newGrid = this.getNewGridWithWallToggled(this.state.grid, row, col);
-    this.setState({grid: newGrid});
+    this.setState({ grid: newGrid });
   }
 
   handleMouseUp() {
-    this.setState({mouseIsPressed: false});
-  }
-
-
-  animateVision(node, prevNode) {
-    let visionX = [1,1,0,0,-1,-1,1,-1,2,2,0,0,-2,-2,2,-2,1,-1,2,2,-2,-2,1,-1]
-    let visionY = [1,-1,1,-1,1,-1,0,0,2,-2,2,-2,2,-2,0,0,2,2,1,-1,1,-1,-2,-2]
-    for (let i = 0; i < 24 ; i ++ ) {
-      let visionNode = document.getElementById(`node-${node.row + visionX[i]}-${node.col + visionY[i]}`)
-
-      if (visionNode) {
-        visionNode.className = 'node node-vision'
-      }
-    }
+    this.setState({ mouseIsPressed: false });
   }
   animateBackTrackTour(backTrackTour) {
     for (let i = 1; i <= backTrackTour.length; i++) {
       if (i === backTrackTour.length) {
-       
-      }
-      else {
+      } else {
         const node = backTrackTour[i];
-        const prevNode = backTrackTour[i-1];
+        const prevNode = backTrackTour[i - 1];
 
         setTimeout(() => {
-          let currentNodeElement = document.getElementById(`node-${node.row}-${node.col}`)
-          let prevNodeElement = document.getElementById(`node-${prevNode.row}-${prevNode.col}`)
-          currentNodeElement.className = 'node node-start';
-          currentNodeElement.childNodes[0].className = 'seen'
-          prevNodeElement.className = 'node node-visited';
-          prevNodeElement.childNodes[0].className = 'unseen'
+          let currentNodeElement = document.getElementById(
+            `node-${node.row}-${node.col}`
+          );
+          let prevNodeElement = document.getElementById(
+            `node-${prevNode.row}-${prevNode.col}`
+          );
+          currentNodeElement.className = "node node-start";
+          currentNodeElement.childNodes[0].className = "seen";
+          prevNodeElement.className = "node node-visited";
+          prevNodeElement.childNodes[0].className = "unseen";
         }, 200 * i);
       }
     }
   }
 
   visualizeBackTracking() {
-
-    const {grid, startNodeRow, startNodeCol, finishNodeRow, finishNodeCol} = this.state;
-    this.setState({gameStarted: true})
+    const {
+      grid,
+      startNodeRow,
+      startNodeCol,
+      maxRow,
+      maxCol,
+    } = this.state;
+    
+    this.setState({ gameStarted: true });
     const startNode = grid[startNodeRow][startNodeCol];
-    const finishNode = grid[finishNodeRow][finishNodeCol];
-    const backTrackTour = backTrack(grid, startNode, finishNode);
-    this.animateBackTrackTour(backTrackTour)
+    const backTrackTour = backTrack(grid, startNode, maxRow, maxCol);
+    this.animateBackTrackTour(backTrackTour);
   }
 
- 
-
   getInitialGrid = () => {
-    const grid = [];
-    for (let row = 0; row < 10; row++) {
-      const currentRow = [];
-      for (let col = 0; col < 30; col++) {
-        currentRow.push(this.createNode(col, row));
+    const {inputData, maxRow, maxCol} = this.state
+    let grid = [];
+    for (let row = 0; row < maxRow; row++) {
+      let currentRow = [];
+      for (let col = 0; col < maxCol; col++) {
+        currentRow.push(this.createNode(col, row, inputData[row][col]));
       }
       grid.push(currentRow);
     }
+    console.log("tester ", grid[0]);
     return grid;
   };
 
-
-
-  createNode = (col, row) => {
-    const { startNodeRow, startNodeCol, finishNodeRow, finishNodeCol, finishNodeRow1, finishNodeCol1} = this.state;
-    return {
+  createNode = (col, row, nodeType) => {
+    let node = {
       col,
       row,
-      isStart: row === startNodeRow && col === startNodeCol,
-      isFinish: (row === finishNodeRow && col === finishNodeCol) || (row === finishNodeRow1 && col === finishNodeCol1),
-      distance: Infinity,
+      isStart: false,
+      isFinish: false,
       isVisited: false,
       isWall: false,
       previousNode: null,
-      point: 
-      (row === finishNodeRow && col === finishNodeCol) || (row === finishNodeRow1 && col === finishNodeCol1)
-      ? 2000 
-      : 0
+      point: 1,
     };
+    switch (nodeType) {
+      case 0:
+        return node;
+      case 1:
+        
+        return {
+          ...node,
+          isWall: true,
+          point: 0
+        };
+      case 2:
+        this.setState({startNodeRow: row, startNodeCol: col})
+        return {
+          ...node,
+          isStart: true,
+        };
+      case 3:
+        this.setState({finishNodeRow: row, finishNodeCol: col})
+        return {
+          ...node,
+          isFinish: true,
+          point: 100000,
+        };
+      default:
+        return node;
+    }
   };
 
   getNewGridWithWallToggled = (grid, row, col) => {
     const newGrid = grid.slice();
-    let stepX = [1,1,0,-1,-1,-1,0,1]
-    let stepY = [0,1,1,1,0,-1,-1,-1]
     const node = newGrid[row][col];
     const newNode = {
       ...node,
       isWall: !node.isWall,
-      // point: 0
+      point: 0
     };
-    for (let i = 0; i < 8; i++) {
-      if (isSafe(row + stepY[i], col + stepX[i])) {
-        const nextNode = newGrid[row + stepY[i]][col + stepX[i]];
-        const affectedNode =  {
-          ...nextNode,
-          point: nextNode.point + 1
-        }
-        newGrid[row + stepY[i]][col + stepX[i]] = affectedNode;
-      }
-    }
+    
     newGrid[row][col] = newNode;
     return newGrid;
   };
 
   render() {
-    const {grid, mouseIsPressed, gameStarted} = this.state;
-
+    const { grid, mouseIsPressed, gameStarted } = this.state;
+    
     return (
       <>
-        <button onClick={() => this.visualizeBackTracking()}>
-          Visualize!
-        </button>
+        <button onClick={() => this.visualizeBackTracking()}>Visualize!</button>
+        <input type="file" onChange={(e) => this.readFromTxtFile(e)}></input>
         <div className="grid">
           {grid.map((row, rowIdx) => {
             return (
               <div key={rowIdx} className="row">
                 {row.map((node, nodeIdx) => {
-                  const {row, col, isFinish, isStart, isWall} = node;
+                  const { row, col, isFinish, isStart, isWall } = node;
                   return (
                     <Node
                       key={nodeIdx}
@@ -172,7 +199,8 @@ export default class PathfindingVisualizer extends Component {
                         this.handleMouseEnter(row, col)
                       }
                       onMouseUp={() => this.handleMouseUp()}
-                      row={row}></Node>
+                      row={row}
+                    ></Node>
                   );
                 })}
               </div>
@@ -183,4 +211,3 @@ export default class PathfindingVisualizer extends Component {
     );
   }
 }
-
