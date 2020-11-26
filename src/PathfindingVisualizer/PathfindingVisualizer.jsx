@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import Node from "./Node/Node";
-import { backTrack, isSafe } from "../algorithms/backTracking";
+import { backTrack } from "../algorithms/backTracking";
 import "./PathfindingVisualizer.css";
-import dropHandler from "../helper/inputFromText.js";
+// import dropHandler from "../helper/inputfromText";
 
 export default class PathfindingVisualizer extends Component {
   constructor() {
@@ -11,18 +11,50 @@ export default class PathfindingVisualizer extends Component {
       gameStarted: false,
       grid: [],
       mouseIsPressed: false,
+      inputData: [],
+      startNodeRow: 0,
+      startNodeCol: 0,
+      finishNodeRow: 0,
+      finishNodeCol: 0,
+      maxRow: 0,
+      maxCol: 0
     };
   }
-  inputFromTextFile = (e) => {
-    let inputData = dropHandler(e);
-    console.log("abc ", inputData);
-    const grid = this.getInitialGrid(inputData);
-    this.setState({ grid });
-  };
+  readFromTxtFile = (evt) => {
+    var inputData = [];
+    var inputMN = []
+    evt.stopPropagation();
+    evt.preventDefault();
+    var files = evt.target.files;
+ 
+    if (files.length !== 1) {
+        return;
+    }
+    var file = files[0];
+    var fileReader = new FileReader();
+ 
+    fileReader.onload =  (progressEvent) => {
+        var stringData = fileReader.result;
+        let str = stringData.split('\n');
+        inputMN = str[0].split(' ').map(x=> parseInt(x));
+        for(let i=0;i<inputMN[0];i++){
+            let inputLine = str[i+1].split(' ').map(x => parseInt(x))
+            inputData.push(inputLine);
+        }
+        this.setState({inputData}, () => {
+          this.setState({maxRow: inputMN[0], maxCol: inputMN[1]}, () => {
+            const grid = this.getInitialGrid(inputData);
+            this.setState({ grid });
+          })
+        })
+    }
+    fileReader.readAsText(file, "UTF-8"); // fileReader.result -> String.
+  }
+  
+
 
   handleMouseDown(row, col) {
     const newGrid = this.getNewGridWithWallToggled(this.state.grid, row, col);
-    console.log(newGrid);
     this.setState({ grid: newGrid, mouseIsPressed: true });
   }
 
@@ -64,26 +96,26 @@ export default class PathfindingVisualizer extends Component {
       grid,
       startNodeRow,
       startNodeCol,
-      finishNodeRow,
-      finishNodeCol,
+      maxRow,
+      maxCol,
     } = this.state;
+    
     this.setState({ gameStarted: true });
     const startNode = grid[startNodeRow][startNodeCol];
-    const finishNode = grid[finishNodeRow][finishNodeCol];
-    const backTrackTour = backTrack(grid, startNode, finishNode);
+    const backTrackTour = backTrack(grid, startNode, maxRow, maxCol);
     this.animateBackTrackTour(backTrackTour);
   }
 
-  getInitialGrid = (inputData) => {
-    let grid = inputData;
-    console.log("123 ", inputData.length);
-    // for (let row = 0; row < inputData.length; row++) {
-    // let currentRow = [];
-    // for (let col = 0; col < inputData[row].length; col++) {
-    // currentRow.push(this.createNode(col, row, inputData[row][col]));
-    // }
-    // grid.push(currentRow);
-    // }
+  getInitialGrid = () => {
+    const {inputData, maxRow, maxCol} = this.state
+    let grid = [];
+    for (let row = 0; row < maxRow; row++) {
+      let currentRow = [];
+      for (let col = 0; col < maxCol; col++) {
+        currentRow.push(this.createNode(col, row, inputData[row][col]));
+      }
+      grid.push(currentRow);
+    }
     console.log("tester ", grid[0]);
     return grid;
   };
@@ -97,63 +129,56 @@ export default class PathfindingVisualizer extends Component {
       isVisited: false,
       isWall: false,
       previousNode: null,
-      point: 0,
+      point: 1,
     };
     switch (nodeType) {
       case 0:
         return node;
       case 1:
+        
         return {
           ...node,
           isWall: true,
+          point: 0
         };
       case 2:
+        this.setState({startNodeRow: row, startNodeCol: col})
         return {
           ...node,
           isStart: true,
         };
       case 3:
+        this.setState({finishNodeRow: row, finishNodeCol: col})
         return {
           ...node,
           isFinish: true,
           point: 100000,
         };
       default:
-        break;
+        return node;
     }
   };
 
   getNewGridWithWallToggled = (grid, row, col) => {
     const newGrid = grid.slice();
-    let stepX = [1, 1, 0, -1, -1, -1, 0, 1];
-    let stepY = [0, 1, 1, 1, 0, -1, -1, -1];
     const node = newGrid[row][col];
     const newNode = {
       ...node,
       isWall: !node.isWall,
-      // point: 0
+      point: 0
     };
-    for (let i = 0; i < 8; i++) {
-      if (isSafe(row + stepY[i], col + stepX[i])) {
-        const nextNode = newGrid[row + stepY[i]][col + stepX[i]];
-        const affectedNode = {
-          ...nextNode,
-          point: nextNode.point + 1,
-        };
-        newGrid[row + stepY[i]][col + stepX[i]] = affectedNode;
-      }
-    }
+    
     newGrid[row][col] = newNode;
     return newGrid;
   };
 
   render() {
     const { grid, mouseIsPressed, gameStarted } = this.state;
-
+    
     return (
       <>
         <button onClick={() => this.visualizeBackTracking()}>Visualize!</button>
-        <input type="file" onChange={(e) => this.inputFromTextFile(e)}></input>
+        <input type="file" onChange={(e) => this.readFromTxtFile(e)}></input>
         <div className="grid">
           {grid.map((row, rowIdx) => {
             return (
