@@ -17,41 +17,39 @@ export default class PathfindingVisualizer extends Component {
       finishNodeRow: 0,
       finishNodeCol: 0,
       maxRow: 0,
-      maxCol: 0
+      maxCol: 0,
     };
   }
   readFromTxtFile = (evt) => {
     var inputData = [];
-    var inputMN = []
+    var inputMN = [];
     evt.stopPropagation();
     evt.preventDefault();
     var files = evt.target.files;
- 
+
     if (files.length !== 1) {
-        return;
+      return;
     }
     var file = files[0];
     var fileReader = new FileReader();
- 
-    fileReader.onload =  (progressEvent) => {
-        var stringData = fileReader.result;
-        let str = stringData.split('\n');
-        inputMN = str[0].split(' ').map(x=> parseInt(x));
-        for(let i=0;i<inputMN[0];i++){
-            let inputLine = str[i+1].split(' ').map(x => parseInt(x))
-            inputData.push(inputLine);
-        }
-        this.setState({inputData}, () => {
-          this.setState({maxRow: inputMN[0], maxCol: inputMN[1]}, () => {
-            const grid = this.getInitialGrid(inputData);
-            this.setState({ grid });
-          })
-        })
-    }
-    fileReader.readAsText(file, "UTF-8"); // fileReader.result -> String.
-  }
-  
 
+    fileReader.onload = (progressEvent) => {
+      var stringData = fileReader.result;
+      let str = stringData.split("\n");
+      inputMN = str[0].split(" ").map((x) => parseInt(x));
+      for (let i = 0; i < inputMN[0]; i++) {
+        let inputLine = str[i + 1].split(" ").map((x) => parseInt(x));
+        inputData.push(inputLine);
+      }
+      this.setState({ inputData }, () => {
+        this.setState({ maxRow: inputMN[0], maxCol: inputMN[1] }, () => {
+          const grid = this.getInitialGrid(inputData);
+          this.setState({ grid });
+        });
+      });
+    };
+    fileReader.readAsText(file, "UTF-8"); // fileReader.result -> String.
+  };
 
   handleMouseDown(row, col) {
     const newGrid = this.getNewGridWithWallToggled(this.state.grid, row, col);
@@ -59,7 +57,6 @@ export default class PathfindingVisualizer extends Component {
   }
 
   handleMouseEnter(row, col) {
-    // console.log('handle mouse entered', row, col)
     if (!this.state.mouseIsPressed) return;
     const newGrid = this.getNewGridWithWallToggled(this.state.grid, row, col);
     this.setState({ grid: newGrid });
@@ -92,14 +89,8 @@ export default class PathfindingVisualizer extends Component {
   }
 
   visualizeBackTracking() {
-    const {
-      grid,
-      startNodeRow,
-      startNodeCol,
-      maxRow,
-      maxCol,
-    } = this.state;
-    
+    const { grid, startNodeRow, startNodeCol, maxRow, maxCol } = this.state;
+
     this.setState({ gameStarted: true });
     const startNode = grid[startNodeRow][startNodeCol];
     const backTrackTour = backTrack(grid, startNode, maxRow, maxCol);
@@ -107,7 +98,7 @@ export default class PathfindingVisualizer extends Component {
   }
 
   getInitialGrid = () => {
-    const {inputData, maxRow, maxCol} = this.state
+    const { inputData, maxRow, maxCol } = this.state;
     let grid = [];
     for (let row = 0; row < maxRow; row++) {
       let currentRow = [];
@@ -116,7 +107,6 @@ export default class PathfindingVisualizer extends Component {
       }
       grid.push(currentRow);
     }
-    console.log("tester ", grid[0]);
     return grid;
   };
 
@@ -135,20 +125,19 @@ export default class PathfindingVisualizer extends Component {
       case 0:
         return node;
       case 1:
-        
         return {
           ...node,
           isWall: true,
-          point: 0
+          point: 0,
         };
       case 2:
-        this.setState({startNodeRow: row, startNodeCol: col})
+        this.setState({ startNodeRow: row, startNodeCol: col });
         return {
           ...node,
           isStart: true,
         };
       case 3:
-        this.setState({finishNodeRow: row, finishNodeCol: col})
+        this.setState({ finishNodeRow: row, finishNodeCol: col });
         return {
           ...node,
           isFinish: true,
@@ -165,16 +154,16 @@ export default class PathfindingVisualizer extends Component {
     const newNode = {
       ...node,
       isWall: !node.isWall,
-      point: 0
+      point: 0,
     };
-    
+
     newGrid[row][col] = newNode;
     return newGrid;
   };
 
   render() {
     const { grid, mouseIsPressed, gameStarted } = this.state;
-    
+
     return (
       <>
         <button onClick={() => this.visualizeBackTracking()}>Visualize!</button>

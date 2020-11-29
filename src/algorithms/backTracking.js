@@ -1,15 +1,19 @@
+import { visionLogic } from "../helper/visionLogic"
+
 let stepX = [1,1,0,-1,-1,-1,0,1]
 let stepY = [0,1,1,1,0,-1,-1,-1]
 export function backTrack(grid, startNode, maxRow, maxCol) {
     var backTrackTour = []
     generateHeuristicMap(grid, maxRow, maxCol)
-    console.log(grid)
-    if (findTarget(grid, startNode, backTrackTour, 0, 1,maxRow, maxCol)) {
-      console.log(backTrackTour)
-      return backTrackTour
-    } else {
-      return backTrackTour
-    }
+    // visionLogic(grid)
+    visionLogic(grid)
+    // if (findTarget(grid, startNode, backTrackTour, 0, 1,maxRow, maxCol)) {
+    //   console.log(backTrackTour)
+    //   return backTrackTour
+    // } else {
+    //   return backTrackTour
+    // }
+    return backTrackTour;
 }
 
 const generateHeuristicMap = (grid, maxRow, maxCol) => {
