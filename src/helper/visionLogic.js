@@ -8,20 +8,21 @@ export const visionLogic = (grid) =>
     console.log(maxRow,' ',maxCol)
     grid.forEach((row) => {
         row.forEach(currentNode => {
-            console.log(!currentNode.isWall,currentNode)
+            // console.log(!currentNode.isWall,currentNode)
             if(!currentNode.isWall){
-                const newNode = {
+                currentNode = {
                     ...currentNode,
-                    vision : [],
-                    newNode : checkVision(grid,currentNode,maxRow,maxCol)
+                    vision : []
                 }
-                grid[currentNode.row][currentNode.col] = newNode;
+                checkVision(grid,currentNode,maxRow,maxCol)
             }
         })
     }
     )
 }
 const checkVision = (grid,node,maxRow,maxCol) => {
+    // console.log('got here')
+
     // checkHorizontal(grid,node,maxRow,maxCol)
     checkVerticle(grid,node,maxRow,maxCol)
     // checkDiagonalLeft(grid,node,maxRow,maxCol)
@@ -33,8 +34,12 @@ const checkVision = (grid,node,maxRow,maxCol) => {
 
 const checkVerticle = (grid,node,maxRow,maxCol) => {
     for (let i = -2; i<=2; i++){
+        
         if(isSafe(node.row + i,node.col,maxRow,maxCol) && grid[node.row + i][node.col].isWall){
+             console.log('got here')
+
             console.log(grid[node.row][node.col])
+            console.log(node.vision)
     //         node.vision.push(grid[node.row + i][node.col]);
     //         if(i < 0){
     //             for (let j = -3; j<i; j++){
