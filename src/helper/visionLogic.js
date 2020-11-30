@@ -28,7 +28,7 @@ const checkVision = (grid,node,maxRow,maxCol) => {
     for(let i = -3; i<=3; i++)
         for(let j = -3; j<=3; j++)
             if(isSafe(node.row + i,node.col + j,maxRow,maxCol) && !node.vision.includes(grid[node.row + i][node.col + j]))
-                arrayTemp.push(grid[node.row + i][node.col + j])
+                arrayTemp.push([node.row + i,node.col + j])
     grid[node.row][node.col].vision = arrayTemp
     // console.log('got here')
     
