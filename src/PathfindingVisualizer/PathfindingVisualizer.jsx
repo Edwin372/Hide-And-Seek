@@ -119,7 +119,7 @@ export default class PathfindingVisualizer extends Component {
       isVisited: false,
       isWall: false,
       previousNode: null,
-      point: 1,
+      point: 0,
     };
     switch (nodeType) {
       case 0:

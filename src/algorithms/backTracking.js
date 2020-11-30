@@ -12,18 +12,27 @@ export function backTrack(grid, startNode, maxRow, maxCol) {
     } else {
       return backTrackTour
     }
+    // return backTrackTour
 }
 
 const generateHeuristicMap = (grid, maxRow, maxCol) => {
     grid.forEach((row) => {
         row.forEach(currentNode => {
             if (currentNode.isWall) {
-                for (let i = 0; i < 8; i++) {
-                    if (isSafe(currentNode.row + stepY[i], currentNode.col + stepX[i], maxRow, maxCol) && !currentNode.isWall) {
-                        const nextNode = grid[currentNode.row + stepY[i]][currentNode.col + stepX[i]];
-                        nextNode.point +=10
+                for (let i = 0; i < 4; i++) {
+                    if (isSafe(currentNode.row + stepY[i], currentNode.col + stepX[i], maxRow, maxCol) ) {
+                        if (!grid[currentNode.row + stepY[i]][currentNode.col + stepX[i]].isWall) {
+                            console.log(currentNode.row, currentNode.col,i)
+                            grid[currentNode.row + stepY[i]][currentNode.col + stepX[i]].point += 2
+                          
+                        }
+                        // else {
+                        //     grid[currentNode.row + stepY[i]][currentNode.col + stepX[i]].point += 1
+                          
+                        // }
+                       
                     }
-                  }
+                }
             }
         })
     })
@@ -39,6 +48,7 @@ const getSeenNode = (currentNode, grid, signArr, maxRow, maxCol) => {
     for (let i = 0; i < signArr.length; i++) {
         if (isSafe(currentNode.row + signArr[i][0], currentNode.col + signArr[i][1], maxRow, maxCol)) {
             let currentSeenNode = grid[currentNode.row + signArr[i][0]][currentNode.col + signArr[i][1]]
+            // console.log(currentSeenNode)
             if (currentSeenNode) {
                 output.push(currentSeenNode)
             }
@@ -47,14 +57,13 @@ const getSeenNode = (currentNode, grid, signArr, maxRow, maxCol) => {
     return output
 }
 
-const effectEachMove = (currentNode,grid)  => {
-    
+const effectEachMove = (currentNode,grid, maxRow, maxCol)  => {
+    // console.log(currentNode)
     currentNode.isVisited = true
-    currentNode.point -=1
+    currentNode.point -= 2
     for (let i = 0; i < 8; i++) {
-        if (isSafe(currentNode.row + stepY[i], currentNode.col + stepX[i])) {
-          const nextNode = grid[currentNode.row + stepY[i]][currentNode.col + stepX[i]];
-          nextNode.point -=5
+        if (isSafe(currentNode.row + stepY[i], currentNode.col + stepX[i], maxRow, maxCol)) {
+          grid[currentNode.row + stepY[i]][currentNode.col + stepX[i]].point -= 2;
         }
     }
 }
@@ -67,11 +76,11 @@ const getHeuristicPoint = (nextNode, signArr, currentNode, grid, maxRow, maxCol)
         
         if (currentNode) {
             let seenNodes = getSeenNode(currentNode, grid, signArr, maxRow, maxCol)
-            // console.log(seenNodes)
-            if (seenNodes.find(node => node.point > 0)) {
-                seenNodes = seenNodes.filter(node => node.point > 0)
-            }
+            // if (seenNodes.find(node => node.point > -20)) {
+            //     seenNodes = seenNodes.filter(node => node.point > -5)
+            // }
             let heuristicPoint = seenNodes.reduce((sum, seenNode) => sum + seenNode.point, 0)
+            // console.log(heuristicPoint)
             return heuristicPoint
         }
     }
@@ -260,41 +269,32 @@ const getVision = (currentNode, grid, maxRow, maxCol) => {
             default: break
         }
     }
-    decisionQueue.filter(item => item[2] >= 0)
-    return decisionQueue.sort((item1, item2) => (item1[2] > item2[2]) ? -1 :  ((item1[2] < item2[2])? 1 : 0))
+    // debugger
+    let output = decisionQueue.sort((item1, item2) => (item1[2] > item2[2]) ? 1 :  ((item1[2] < item2[2])? -1 : 0))[decisionQueue.length - 1];
+    console.log(decisionQueue)
+    // console.log(output)
+    return output
 }
 
 const findTarget = (grid, currentNode, backTrackTour, stepCount, remainingHider, maxRow, maxCol) => {
-    if (remainingHider === 0 ) {
-        console.log(remainingHider)
-        return backTrackTour
-    }
-    if (currentNode.isFinish || stepCount  === maxRow * maxCol) {
-        remainingHider -= 1
-        console.log(remainingHider)
-        backTrackTour.push(currentNode)
-        currentNode.isVisited = true
-        // return backTrackTour
-    }
-    let decisionQueue = getVision(currentNode, grid, maxRow, maxCol).filter(item => item[2] > 0)
-    // console.log(decisionQueue)
-    backTrackTour.push(currentNode)
-    effectEachMove(currentNode, grid)
-   
-
-    for (let i = 0; i < decisionQueue.length; i++) {
-        let nextNodeCol = currentNode.col + decisionQueue[i][1]
-        let nextNodeRow = currentNode.row + decisionQueue[i][0]
-        if (
-            isSafe(nextNodeRow, nextNodeRow, maxRow, maxCol) &&
-            grid[nextNodeRow][nextNodeCol].isVisited !== true && 
-            grid[nextNodeRow][nextNodeCol].isWall !== true
-        ) {
-            
-            let nextNode = grid[nextNodeRow][nextNodeCol]
-            if(findTarget(grid, nextNode, backTrackTour, stepCount + 1, remainingHider, maxRow, maxCol)) return backTrackTour
-            backTrackTour.push(currentNode)
+    let curNode = currentNode
+    while (remainingHider > 0 || stepCount > maxRow * maxCol) {
+        stepCount +=1
+         if (remainingHider === 0 ) {
+            return backTrackTour
         }
+        if (curNode.isFinish || stepCount  === maxRow * maxCol) {
+            remainingHider -= 1
+            backTrackTour.push(curNode)
+            curNode.isVisited = true
+            // return backTrackTour
+        }
+        effectEachMove(curNode, grid, maxRow, maxCol)
+        let decision = getVision(curNode, grid, maxRow, maxCol)
+        // console.log(decision)
+        backTrackTour.push(curNode)
+        curNode = grid[curNode.row + decision[0]][curNode.col + decision[1]]
     }
-    // return backTrackTour
+    console.log(grid, 'grid')
+    return backTrackTour
 }
