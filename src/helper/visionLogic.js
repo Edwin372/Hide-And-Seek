@@ -21,13 +21,19 @@ export const visionLogic = (grid) =>
     )
 }
 const checkVision = (grid,node,maxRow,maxCol) => {
-    // console.log('got here')
-
-    // checkHorizontal(grid,node,maxRow,maxCol)
+    let arrayTemp = []
+    checkHorizontal(grid,node,maxRow,maxCol)
     checkVerticle(grid,node,maxRow,maxCol)
-    // checkDiagonalLeft(grid,node,maxRow,maxCol)
-    // checkDiagonalRight(grid,node,maxRow,maxCol)
-    // checkHorse(grid,node,maxRow,maxCol)
+    checkDiagonalLeft(grid,node,maxRow,maxCol)
+    checkDiagonalRight(grid,node,maxRow,maxCol)
+    checkHorse(grid,node,maxRow,maxCol)
+    node.vision = Array.from(new Set(node.vision));
+    for(let i = -3; i<=3; i++)
+        for(let j = -3; j<=3; j++)
+            if(isSafe(node.row + i,node.col + j,maxRow,maxCol) && !node.vision.includes(grid[node.row + i][node.col + j]))
+                arrayTemp.push(grid[node.row + i][node.col + j])
+    node.vision = arrayTemp
+    // console.log('got here')
     // console.log(node.vision)
     return node;
 }
@@ -36,43 +42,40 @@ const checkVerticle = (grid,node,maxRow,maxCol) => {
     for (let i = -2; i<=2; i++){
         
         if(isSafe(node.row + i,node.col,maxRow,maxCol) && grid[node.row + i][node.col].isWall){
-             console.log('got here')
-
-            console.log(grid[node.row][node.col])
-            console.log(node.vision)
-    //         node.vision.push(grid[node.row + i][node.col]);
-    //         if(i < 0){
-    //             for (let j = -3; j<i; j++){
-    //                 if(isSafe(node.row + j,node.col,maxRow,maxCol))
-    //                     node.vision.push(grid[node.row + j][node.col]);
-    //                 if(isSafe(node.row+j,node.col+j,maxRow,maxCol))
-    //                     node.vision.push(grid[node.row+j][node.col+j]);
-    //                 if(isSafe(node.row-j,node.col+j,maxRow,maxCol))
-    //                     node.vision.push(grid[node.row-j][node.col+j]);
-    //             }
-    //         }
-    //         if(i > 0){
-    //             for (let j = 3; j>i; j--){
-    //                 if(isSafe(node.row+j,node.col,maxRow,maxCol))
-    //                     node.vision.push(grid[node.row + j][node.col]);
-    //                 if(isSafe(node.row+j,node.col+j,maxRow,maxCol))
-    //                     node.vision.push(grid[node.row+j][node.col+j]);
-    //                 if(isSafe(node.row-j,node.col+j,maxRow,maxCol))
-    //                     node.vision.push(grid[node.row-j][node.col+j]);
-    //             }
-    //         }
-    //         if(i === -1){
-    //             if(isSafe(node.row-3,node.col-1,maxRow,maxCol))
-    //                 node.vision.push(grid[node.row-3][node.col-1]);
-    //             if(isSafe(node.row-3,node.col+1,maxRow,maxCol))
-    //                 node.vision.push(grid[node.row-3][node.col+1]);
-    //         }
-    //         if(i === 1){
-    //             if(isSafe(node.row+3,node.col-1,maxRow,maxCol))
-    //                 node.vision.push(grid[node.row+3][node.col-1]);
-    //             if(isSafe(node.row+3,node.col+1,maxRow,maxCol))
-    //                 node.vision.push(grid[node.row+3][node.col+1]);
-    //         }
+            node.vision.push(grid[node.row + i][node.col]);
+            if(i < 0){  //Check North
+                for (let j = -3; j<i; j++){
+                    if(isSafe(node.row + j,node.col,maxRow,maxCol))
+                        node.vision.push(grid[node.row + j][node.col]);//North
+                    if(isSafe(node.row+j,node.col+j-i,maxRow,maxCol) && i>-3)
+                        node.vision.push(grid[node.row+j][node.col+j-i]);//NorthWest
+                    if(isSafe(node.row+j,node.col-j+i,maxRow,maxCol))
+                        node.vision.push(grid[node.row+j][node.col-j+i]);//NorthEast
+                }
+            }
+            if(i > 0){  //Check South
+                for (let j = 3; j>i; j--){
+                    if(isSafe(node.row+j,node.col,maxRow,maxCol))
+                        node.vision.push(grid[node.row + j][node.col]);//South
+                    if(isSafe(node.row+j,node.col+j-i,maxRow,maxCol))
+                        node.vision.push(grid[node.row+j][node.col+j-i]);//SouthEast
+                    if(isSafe(node.row+j,node.col+j-i,maxRow,maxCol))
+                        node.vision.push(grid[node.row+j][node.col-j+i]);//SouthWest
+                }
+            }
+            if(i === -1){
+                if(isSafe(node.row-3,node.col-1,maxRow,maxCol))
+                    node.vision.push(grid[node.row-3][node.col-1]);
+                if(isSafe(node.row-3,node.col+1,maxRow,maxCol))
+                    node.vision.push(grid[node.row-3][node.col+1]);
+            }
+            if(i === 1){
+                if(isSafe(node.row+3,node.col-1,maxRow,maxCol))
+                    node.vision.push(grid[node.row+3][node.col-1]);
+                if(isSafe(node.row+3,node.col+1,maxRow,maxCol))
+                    node.vision.push(grid[node.row+3][node.col+1]);
+            }
+            else continue
         }
     }
 }
@@ -84,21 +87,21 @@ const checkHorizontal = (grid,node,maxRow,maxCol) => {
             if(i < 0){
                 for (let j = -3; j<i; j++){
                     if(isSafe(node.row,node.col+j,maxRow,maxCol))
-                        node.vision.push(grid[node.row][node.col + j]);
-                    if(isSafe(node.row+j,node.col+j,maxRow,maxCol))
-                        node.vision.push(grid[node.row+j][node.col+j]);
-                    if(isSafe(node.row+j,node.col-j,maxRow,maxCol))
-                        node.vision.push(grid[node.row+j][node.col-j]);
+                        node.vision.push(grid[node.row][node.col + j]); // West
+                    if(isSafe(node.row+j-i,node.col+j,maxRow,maxCol))
+                        node.vision.push(grid[node.row+j-i][node.col+j]); // NorthWest
+                    if(isSafe(node.row-j+i,node.col+j,maxRow,maxCol))
+                        node.vision.push(grid[node.row-j+i][node.col+j]); // SouthWest
                 }
             }
             if(i > 0){
                 for (let j = 3; j>i; j--){
                     if(isSafe(node.row,node.col+j,maxRow,maxCol))
-                        node.vision.push(grid[node.row][node.col + j]);
-                    if(isSafe(node.row+j,node.col+j,maxRow,maxCol))
-                        node.vision.push(grid[node.row+j][node.col+j]);
-                    if(isSafe(node.row+j,node.col-j,maxRow,maxCol))
-                        node.vision.push(grid[node.row+j][node.col-j]);
+                        node.vision.push(grid[node.row][node.col + j]); // East
+                    if(isSafe(node.row-j+i,node.col+j,maxRow,maxCol))
+                        node.vision.push(grid[node.row+i-j][node.col+j]); // NorthEast
+                    if(isSafe(node.row+j-i,node.col+j,maxRow,maxCol))
+                        node.vision.push(grid[node.row+j-i][node.col+j]); // SouthEast
                 }
             }
             if(i === -1){
@@ -121,25 +124,25 @@ const checkHorizontal = (grid,node,maxRow,maxCol) => {
 const checkDiagonalRight = (grid,node,maxRow,maxCol) => {
     for(let i=-2;i<=2;++i){
         if (isSafe(node.row-i,node.col+i,maxRow,maxCol) && grid[node.row - i][node.col + i].isWall){
-            node.vision.push(grid[node.row - i][node.col + i])
+            node.vision.push(grid[node.row - i][node.col + i]) // DiagonalRight
             if(i<0){
                 for(let j=-3;j<i;j++){
                     if(isSafe(node.row-j,node.col+j,maxRow,maxCol))
-                        node.vision.push(grid[node.row-j][node.col+j])
+                        node.vision.push(grid[node.row-j][node.col+ j]) // Check South West 
                     if(isSafe(node.row-i,node.col+j,maxRow,maxCol))
-                        node.vision.push(grid[node.row-i][node.col+j])
+                        node.vision.push(grid[node.row-i][node.col+j]) // Check West
                     if(isSafe(node.row-j,node.col+i,maxRow,maxCol))
-                        node.vision.push(grid[node.row-j][node.col+i])
+                        node.vision.push(grid[node.row-j][node.col+i]) // Check South
                 }
             }
             if(i>0){
                 for(let j=3;j>i;j--){
                     if(isSafe(node.row-j,node.col+j,maxRow,maxCol))
-                        node.vision.push(grid[node.row-j][node.col+j])
+                        node.vision.push(grid[node.row-j][node.col+j]) // Check North East
                     if(isSafe(node.row-i,node.col+j,maxRow,maxCol))
-                        node.vision.push(grid[node.row-i][node.col+j])
+                        node.vision.push(grid[node.row-i][node.col+j]) // Check East
                     if(isSafe(node.row-j,node.col+i,maxRow,maxCol))
-                        node.vision.push(grid[node.row-j][node.col+i])
+                        node.vision.push(grid[node.row-j][node.col+i]) // Check North
                 }
             }
             if (i === 1){
@@ -154,36 +157,48 @@ const checkDiagonalRight = (grid,node,maxRow,maxCol) => {
                 if(isSafe(node.row+2,node.col-3,maxRow,maxCol))
                     node.vision.push(grid[node.row+2][node.col-3])
             }
+            else continue
         }
     }
 }
 
 const checkDiagonalLeft = (grid,node,maxRow,maxCol) => {
     for(let i=-2;i<=2;++i){
-        if (grid[node.row + i][node.col + i] && grid[node.row + i][node.col + i].isWall){
+        if (isSafe(node.row + i,node.col + i,maxRow,maxCol) && grid[node.row + i][node.col + i].isWall){
             node.vision.push(grid[node.row + i][node.col + i])
             if(i<0){
                 for(let j=-3;j<i;j++){
-                    node.vision.push(grid[node.row+j][node.col+j])
-                    node.vision.push(grid[node.row+i][node.col+j])
-                    node.vision.push(grid[node.row+j][node.col+i])
+                    if(isSafe(node.row + j,node.col + j,maxRow,maxCol))
+                        node.vision.push(grid[node.row+j][node.col+j]) // Check North West
+                    if(isSafe(node.row + i,node.col + j,maxRow,maxCol))
+                        node.vision.push(grid[node.row+i][node.col+j]) // Check North
+                    if(isSafe(node.row + j,node.col + i,maxRow,maxCol))
+                        node.vision.push(grid[node.row+j][node.col+i]) // Check West
                 }
             }
             if(i>0){
                 for(let j=3;j>i;j--){
-                    node.vision.push(grid[node.row+j][node.col+j])
-                    node.vision.push(grid[node.row+i][node.col+j])
-                    node.vision.push(grid[node.row+j][node.col+i])
+                    if(isSafe(node.row + j,node.col + j,maxRow,maxCol))
+                        node.vision.push(grid[node.row+j][node.col+j])
+                    if(isSafe(node.row + i,node.col + j,maxRow,maxCol))
+                        node.vision.push(grid[node.row+i][node.col+j])
+                    if(isSafe(node.row + j,node.col + i,maxRow,maxCol))
+                        node.vision.push(grid[node.row+j][node.col+i])
                 }
             }
             if (i === 1){
-                node.vision.push(grid[node.row+3][node.col+2])
-                node.vision.push(grid[node.row+2][node.col+3])
+                if(isSafe(node.row + 3,node.col + 2,maxRow,maxCol))
+                    node.vision.push(grid[node.row+3][node.col+2])
+                if(isSafe(node.row + 2,node.col + 3,maxRow,maxCol))
+                    node.vision.push(grid[node.row+2][node.col+3])
             }
             if (i === -1){
-                node.vision.push(grid[node.row-3][node.col-2])
-                node.vision.push(grid[node.row-2][node.col-3])
+                if(isSafe(node.row - 3,node.col - 2,maxRow,maxCol))
+                    node.vision.push(grid[node.row-3][node.col-2])
+                if(isSafe(node.row - 2,node.col - 3,maxRow,maxCol))
+                    node.vision.push(grid[node.row-2][node.col-3])
             }
+            else continue
         }
     }
 }
@@ -191,47 +206,63 @@ const arrX = [-2, -2, +2, +2, -1, -1, +1, +1]
 const arrY = [-1, +1, -1, +1, -2, +2, -2, +2]
 const checkHorse = (grid,node,maxRow,maxCol) => {
     for(let i=0;i<8; i++){
-        if(grid[node.row + arrX[i]][node.col + arrY[i]].isWall){
+        if(isSafe(node.row + arrX[i],node.col + arrY[i], maxRow,maxCol) && grid[node.row + arrX[i]][node.col + arrY[i]].isWall){
             node.vision.push(grid[node.row + arrX[i]][node.col + arrY[i]])
             switch(i){
                 case 0: {
-                    node.vision.push(grid[node.row-3][node.col-1])
-                    node.vision.push(grid[node.row-3][node.col-2])
+                    if(isSafe(node.row - 3,node.col - 1,maxRow,maxCol))
+                        node.vision.push(grid[node.row-3][node.col-1])
+                    if(isSafe(node.row - 3,node.col - 2,maxRow,maxCol))
+                        node.vision.push(grid[node.row-3][node.col-2])
                     break
                 }
                 case 1:{
-                    node.vision.push(grid[node.row-3][node.col+1])
-                    node.vision.push(grid[node.row-3][node.col+2])
+                    if(isSafe(node.row - 3,node.col + 1,maxRow,maxCol))
+                        node.vision.push(grid[node.row-3][node.col+1])
+                    if(isSafe(node.row - 3,node.col + 2,maxRow,maxCol))
+                        node.vision.push(grid[node.row-3][node.col+2])
                     break
                 }
                 case 2:{
-                    node.vision.push(grid[node.row+3][node.col-1])
-                    node.vision.push(grid[node.row+3][node.col-2])
+                    if(isSafe(node.row + 3,node.col - 1,maxRow,maxCol))
+                        node.vision.push(grid[node.row+3][node.col-1])
+                    if(isSafe(node.row + 3,node.col - 2,maxRow,maxCol))
+                        node.vision.push(grid[node.row+3][node.col-2])
                     break
                 }
                 case 3:{
-                    node.vision.push(grid[node.row+3][node.col+1])
-                    node.vision.push(grid[node.row+3][node.col+2])
+                    if(isSafe(node.row + 3,node.col + 1,maxRow,maxCol))
+                        node.vision.push(grid[node.row+3][node.col+1])
+                    if(isSafe(node.row + 3,node.col + 2,maxRow,maxCol))    
+                        node.vision.push(grid[node.row+3][node.col+2])
                     break
                 }
                 case 4:{
-                    node.vision.push(grid[node.row-1][node.col-3])
-                    node.vision.push(grid[node.row-2][node.col-3])
+                    if(isSafe(node.row - 1,node.col - 3,maxRow,maxCol))
+                        node.vision.push(grid[node.row-1][node.col-3])
+                    if(isSafe(node.row - 2,node.col - 3,maxRow,maxCol))
+                        node.vision.push(grid[node.row-2][node.col-3])
                     break
                 }
                 case 5:{
-                    node.vision.push(grid[node.row-1][node.col+3])
-                    node.vision.push(grid[node.row-2][node.col+3])
+                    if(isSafe(node.row - 1,node.col + 3,maxRow,maxCol))
+                        node.vision.push(grid[node.row-1][node.col+3])
+                    if(isSafe(node.row - 2,node.col + 3,maxRow,maxCol))
+                        node.vision.push(grid[node.row-2][node.col+3])
                     break
                 }
                 case 6:{
-                    node.vision.push(grid[node.row+1][node.col-3])
-                    node.vision.push(grid[node.row+2][node.col-3])
+                    if(isSafe(node.row + 1,node.col - 3,maxRow,maxCol))
+                        node.vision.push(grid[node.row+1][node.col-3])
+                    if(isSafe(node.row + 2,node.col - 3,maxRow,maxCol))
+                        node.vision.push(grid[node.row+2][node.col-3])
                     break
                 }
                 case 7:{
-                    node.vision.push(grid[node.row+1][node.col+3])
-                    node.vision.push(grid[node.row+2][node.col+3])
+                    if(isSafe(node.row + 1,node.col + 3,maxRow,maxCol))
+                        node.vision.push(grid[node.row+1][node.col+3])
+                    if(isSafe(node.row + 2,node.col + 3,maxRow,maxCol))
+                        node.vision.push(grid[node.row+2][node.col+3])
                     break
                 }
                 default:
