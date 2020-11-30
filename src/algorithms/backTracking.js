@@ -312,7 +312,7 @@ const getVision = (currentNode, grid, maxRow, maxCol) => {
 
 const findTarget = (grid, currentNode, backTrackTour, stepCount, remainingHider, maxRow, maxCol) => {
     let curNode = currentNode
-    while (remainingHider > 0 || stepCount > maxRow * maxCol) {
+    while (remainingHider > 0) {
         stepCount +=1
          if (remainingHider === 0 ) {
             return backTrackTour
