@@ -81,8 +81,9 @@ export default class PathfindingVisualizer extends Component {
             `node-${prevNode.row}-${prevNode.col}`
           );
           currentNodeElement.className = "node node-start";
-          prevNodeElement.className = "node";
           this.animateVision(node.vision, prevNode.vision)
+          prevNodeElement.className = "node node-visited";
+
         }, 200 * i);
       }
     }
@@ -91,10 +92,10 @@ export default class PathfindingVisualizer extends Component {
   animateVision(curVision, prevVision) {
     // console.log(curVision, prevVision);
     prevVision.forEach((item) => {
-      document.getElementById( `node-${item.row}-${item.col}`).childNodes[0].className = 'unseen'
+      document.getElementById( `node-${item[0]}-${item[1]}`).childNodes[0].className = 'unseen'
     })
     curVision.forEach((item) => {
-      document.getElementById( `node-${item.row}-${item.col}`).childNodes[0].className = 'seen'
+      document.getElementById( `node-${item[0]}-${item[1]}`).childNodes[0].className = 'seen'
     })
    
   }

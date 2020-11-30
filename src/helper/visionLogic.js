@@ -28,7 +28,7 @@ const checkVision = (grid,node,maxRow,maxCol) => {
     for(let i = -3; i<=3; i++)
         for(let j = -3; j<=3; j++)
             if(isSafe(node.row + i,node.col + j,maxRow,maxCol) && !node.vision.includes(grid[node.row + i][node.col + j]))
-                arrayTemp.push({row:node.row + i,col: node.col + j})
+                arrayTemp.push([node.row + i,node.col + j])
     grid[node.row][node.col].vision = arrayTemp
     // console.log('got here')
     
@@ -36,7 +36,7 @@ const checkVision = (grid,node,maxRow,maxCol) => {
 }
 
 const checkVerticle = (grid,node,maxRow,maxCol) => {
-    for (let i = -2; i<=2; i++){
+    for (let i = -3; i<=3; i++){
         
         if(isSafe(node.row + i,node.col,maxRow,maxCol) && grid[node.row + i][node.col].isWall){
             node.vision.push(grid[node.row + i][node.col]);
@@ -78,7 +78,7 @@ const checkVerticle = (grid,node,maxRow,maxCol) => {
 }
 
 const checkHorizontal = (grid,node,maxRow,maxCol) => {
-    for (let i = -2; i<=2; i++){
+    for (let i = -3; i<=3; i++){
         if(isSafe(node.row,node.col+i,maxRow,maxCol) && grid[node.row][node.col + i].isWall){
             node.vision.push(grid[node.row][node.col+i]);
             if(i < 0){
@@ -119,7 +119,7 @@ const checkHorizontal = (grid,node,maxRow,maxCol) => {
 }
 
 const checkDiagonalRight = (grid,node,maxRow,maxCol) => {
-    for(let i=-2;i<=2;++i){
+    for(let i=-3;i<=3;++i){
         if (isSafe(node.row-i,node.col+i,maxRow,maxCol) && grid[node.row - i][node.col + i].isWall){
             node.vision.push(grid[node.row - i][node.col + i]) // DiagonalRight
             if(i<0){
@@ -160,7 +160,7 @@ const checkDiagonalRight = (grid,node,maxRow,maxCol) => {
 }
 
 const checkDiagonalLeft = (grid,node,maxRow,maxCol) => {
-    for(let i=-2;i<=2;++i){
+    for(let i=-3;i<=3;++i){
         if (isSafe(node.row + i,node.col + i,maxRow,maxCol) && grid[node.row + i][node.col + i].isWall){
             node.vision.push(grid[node.row + i][node.col + i])
             if(i<0){
