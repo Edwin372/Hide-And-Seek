@@ -12,7 +12,6 @@ export function backTrack(grid, startNode, maxRow, maxCol) {
     } else {
       return backTrackTour
     }
-    return backTrackTour;
 }
 
 const generateHeuristicMap = (grid, maxRow, maxCol) => {
