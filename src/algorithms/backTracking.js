@@ -7,13 +7,13 @@ export function backTrack(grid, startNode, maxRow, maxCol) {
     generateHeuristicMap(grid, maxRow, maxCol)
     visionLogic(grid,maxRow,maxCol)
     console.log(grid)
-    // if (findTarget(grid, startNode, backTrackTour, 0, 1,maxRow, maxCol)) {
-    //   console.log(backTrackTour)
-    //   return backTrackTour
-    // } else {
-    //   return backTrackTour
-    // }
-    return backTrackTour
+    if (findTarget(grid, startNode, backTrackTour, 0, 1,maxRow, maxCol)) {
+      console.log(backTrackTour)
+      return backTrackTour
+    } else {
+      return backTrackTour
+    }
+    // return backTrackTour
 }
 
 const generateHeuristicMap = (grid, maxRow, maxCol) => {

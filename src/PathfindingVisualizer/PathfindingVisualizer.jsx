@@ -65,6 +65,7 @@ export default class PathfindingVisualizer extends Component {
   handleMouseUp() {
     this.setState({ mouseIsPressed: false });
   }
+
   animateBackTrackTour(backTrackTour) {
     for (let i = 1; i <= backTrackTour.length; i++) {
       if (i === backTrackTour.length) {
@@ -80,12 +81,22 @@ export default class PathfindingVisualizer extends Component {
             `node-${prevNode.row}-${prevNode.col}`
           );
           currentNodeElement.className = "node node-start";
-          currentNodeElement.childNodes[0].className = "seen";
-          prevNodeElement.className = "node node-visited";
-          prevNodeElement.childNodes[0].className = "unseen";
+          prevNodeElement.className = "node";
+          this.animateVision(node.vision, prevNode.vision)
         }, 200 * i);
       }
     }
+  }
+
+  animateVision(curVision, prevVision) {
+    // console.log(curVision, prevVision);
+    prevVision.forEach((item) => {
+      document.getElementById( `node-${item.row}-${item.col}`).childNodes[0].className = 'unseen'
+    })
+    curVision.forEach((item) => {
+      document.getElementById( `node-${item.row}-${item.col}`).childNodes[0].className = 'seen'
+    })
+   
   }
 
   visualizeBackTracking() {
@@ -160,6 +171,8 @@ export default class PathfindingVisualizer extends Component {
     newGrid[row][col] = newNode;
     return newGrid;
   };
+
+  
 
   render() {
     const { grid, mouseIsPressed, gameStarted } = this.state;
