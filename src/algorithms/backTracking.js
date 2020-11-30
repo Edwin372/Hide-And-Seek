@@ -5,14 +5,15 @@ let stepY = [0,1,1,1,0,-1,-1,-1]
 export function backTrack(grid, startNode, maxRow, maxCol) {
     var backTrackTour = []
     generateHeuristicMap(grid, maxRow, maxCol)
-    visionLogic(grid)
-    if (findTarget(grid, startNode, backTrackTour, 0, 1,maxRow, maxCol)) {
-      console.log(backTrackTour)
-      return backTrackTour
-    } else {
-      return backTrackTour
-    }
-    // return backTrackTour
+    visionLogic(grid,maxRow,maxCol)
+    console.log(grid)
+    // if (findTarget(grid, startNode, backTrackTour, 0, 1,maxRow, maxCol)) {
+    //   console.log(backTrackTour)
+    //   return backTrackTour
+    // } else {
+    //   return backTrackTour
+    // }
+    return backTrackTour
 }
 
 const generateHeuristicMap = (grid, maxRow, maxCol) => {
@@ -22,7 +23,7 @@ const generateHeuristicMap = (grid, maxRow, maxCol) => {
                 for (let i = 0; i < 4; i++) {
                     if (isSafe(currentNode.row + stepY[i], currentNode.col + stepX[i], maxRow, maxCol) ) {
                         if (!grid[currentNode.row + stepY[i]][currentNode.col + stepX[i]].isWall) {
-                            console.log(currentNode.row, currentNode.col,i)
+                            // console.log(currentNode.row, currentNode.col,i)
                             grid[currentNode.row + stepY[i]][currentNode.col + stepX[i]].point += 2
                           
                         }

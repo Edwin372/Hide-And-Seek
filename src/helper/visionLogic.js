@@ -1,10 +1,7 @@
 import {isSafe} from "../algorithms/backTracking"
 
-export const visionLogic = (grid) =>
-{
+export const visionLogic = (grid, maxRow, maxCol) => {
     // console.log(grid[0],'tester')
-    let maxRow = grid.length
-    let maxCol = grid[0].length
     console.log(maxRow,' ',maxCol)
     grid.forEach((row) => {
         row.forEach(currentNode => {
@@ -32,10 +29,10 @@ const checkVision = (grid,node,maxRow,maxCol) => {
         for(let j = -3; j<=3; j++)
             if(isSafe(node.row + i,node.col + j,maxRow,maxCol) && !node.vision.includes(grid[node.row + i][node.col + j]))
                 arrayTemp.push(grid[node.row + i][node.col + j])
-    node.vision = arrayTemp
+    grid[node.row][node.col].vision = arrayTemp
     // console.log('got here')
-    // console.log(node.vision)
-    return node;
+    
+    // console.log(node)
 }
 
 const checkVerticle = (grid,node,maxRow,maxCol) => {
