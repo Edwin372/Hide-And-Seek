@@ -14,8 +14,7 @@ export default class PathfindingVisualizer extends Component {
       inputData: [],
       startNodeRow: 0,
       startNodeCol: 0,
-      finishNodeRow: 0,
-      finishNodeCol: 0,
+      finishNodes: 0,
       maxRow: 0,
       maxCol: 0,
     };
@@ -84,7 +83,7 @@ export default class PathfindingVisualizer extends Component {
           this.animateVision(node.vision, prevNode.vision)
           prevNodeElement.className = "node node-visited";
 
-        }, 200 * i);
+        }, 125 * i);
       }
     }
   }
@@ -101,11 +100,11 @@ export default class PathfindingVisualizer extends Component {
   }
 
   visualizeBackTracking() {
-    const { grid, startNodeRow, startNodeCol, maxRow, maxCol } = this.state;
-
+    const { grid, startNodeRow, startNodeCol, maxRow, maxCol, finishNodes} = this.state;
+    console.log(finishNodes)
     this.setState({ gameStarted: true });
     const startNode = grid[startNodeRow][startNodeCol];
-    const backTrackTour = backTrack(grid, startNode, maxRow, maxCol);
+    const backTrackTour = backTrack(grid, startNode, maxRow, maxCol, finishNodes);
     this.animateBackTrackTour(backTrackTour);
   }
 
@@ -131,6 +130,7 @@ export default class PathfindingVisualizer extends Component {
       isVisited: false,
       isWall: false,
       previousNode: null,
+      isFound: false,
       point: 0,
     };
     switch (nodeType) {
@@ -149,7 +149,9 @@ export default class PathfindingVisualizer extends Component {
           isStart: true,
         };
       case 3:
-        this.setState({ finishNodeRow: row, finishNodeCol: col });
+        this.setState((state) => {
+          return {finishNodes: state.finishNodes + 1}
+        })
         return {
           ...node,
           isFinish: true,
@@ -168,7 +170,6 @@ export default class PathfindingVisualizer extends Component {
       isWall: !node.isWall,
       point: 0,
     };
-
     newGrid[row][col] = newNode;
     return newGrid;
   };

@@ -2,12 +2,12 @@ import { visionLogic } from "../helper/visionLogic"
 
 let stepX = [1,0,-1,0,1,1,-1,-1]
 let stepY = [0,1,0,-1,1,-1,1, 1]
-export function backTrack(grid, startNode, maxRow, maxCol) {
+export function backTrack(grid, startNode, maxRow, maxCol, hidingTargets) {
     var backTrackTour = []
     generateHeuristicMap(grid, maxRow, maxCol)
     visionLogic(grid,maxRow,maxCol)
     console.log(grid)
-    if (findTarget(grid, startNode, backTrackTour, 0, 1,maxRow, maxCol)) {
+    if (findTarget(grid, startNode, backTrackTour, 0, hidingTargets,maxRow, maxCol)) {
       console.log(backTrackTour)
       return backTrackTour
     } else {
@@ -57,7 +57,7 @@ const getSeenNode = (currentNode, grid, signArr, maxRow, maxCol) => {
 
 const effectEachMove = (currentNode,grid, maxRow, maxCol)  => {
     currentNode.isVisited = true
-    currentNode.point -= 1
+    currentNode.point -= 2
     // currentNode.vision.forEach(item => {
     //     // grid[item[0]][item[1]].point = +1
     // })
@@ -107,11 +107,9 @@ const getVision = (currentNode, grid, maxRow, maxCol) => {
                     [2,3],
                     [0,1]
                 ]
-                let currentEastVision = eastSignArr.filter(sign => {
-                    if (currentNode.vision.find(item => item[0] === sign[0] + currentNode.row && item[1] === sign[1] + currentNode.col)) {
-                        return sign
-                    }
-                })
+                let currentEastVision = eastSignArr.filter(sign => 
+                    currentNode.vision.find(item => item[0] === sign[0] + currentNode.row && item[1] === sign[1] + currentNode.col)
+                )
                 if (isSafe(currentNode.row, currentNode.col + 1, maxRow, maxCol)) {
                     let eastHeuristicPoint = getHeuristicPoint(grid[currentNode.row][currentNode.col + 1], currentEastVision, currentNode, grid, maxRow, maxCol)
                     if (eastHeuristicPoint !== null) {
@@ -133,11 +131,9 @@ const getVision = (currentNode, grid, maxRow, maxCol) => {
                     [-1,3],
                     [-2,3],
                 ]
-                let currentEastNorthVision = eastNorthSignArr.filter(sign => {
-                    if (currentNode.vision.find(item => item[0] === sign[0] + currentNode.row && item[1] === sign[1] + currentNode.col)) {
-                        return sign
-                    }
-                })
+                let currentEastNorthVision = eastNorthSignArr.filter(sign => 
+                    currentNode.vision.find(item => item[0] === sign[0] + currentNode.row && item[1] === sign[1] + currentNode.col)
+                )
                 if (isSafe(currentNode.row - 1, currentNode.col + 1, maxRow, maxCol)) {
                     let eastNorthHeuristicPoint = getHeuristicPoint(grid[currentNode.row - 1][currentNode.col + 1], currentEastNorthVision, currentNode, grid, maxRow, maxCol)
                     if (eastNorthHeuristicPoint !== null) {
@@ -159,11 +155,9 @@ const getVision = (currentNode, grid, maxRow, maxCol) => {
                     [-3,2],
                     [-1,0]
                 ]
-                let currentNorthVision = northSignArr.filter(sign => {
-                    if (currentNode.vision.find(item => item[0] === sign[0] + currentNode.row && item[1] === sign[1] + currentNode.col)) {
-                        return sign
-                    }
-                })
+                let currentNorthVision = northSignArr.filter(sign => 
+                    currentNode.vision.find(item => item[0] === sign[0] + currentNode.row && item[1] === sign[1] + currentNode.col)
+                )
                 if (isSafe(currentNode.row - 1, currentNode.col , maxRow, maxCol)) {
                     let northHeuristicPoint = getHeuristicPoint( grid[currentNode.row - 1][currentNode.col], currentNorthVision, currentNode, grid, maxRow, maxCol)
                     if (northHeuristicPoint !== null) {
@@ -185,11 +179,9 @@ const getVision = (currentNode, grid, maxRow, maxCol) => {
                     [-3,-2],
                     [-1,-1]
                 ]
-                let currentWestNorthVision = westNorthSignArr.filter(sign => {
-                    if (currentNode.vision.find(item => item[0] === sign[0] + currentNode.row && item[1] === sign[1] + currentNode.col)) {
-                        return sign
-                    }
-                })
+                let currentWestNorthVision = westNorthSignArr.filter(sign => 
+                    currentNode.vision.find(item => item[0] === sign[0] + currentNode.row && item[1] === sign[1] + currentNode.col)
+                )
                 if (isSafe(currentNode.row - 1, currentNode.col - 1, maxRow, maxCol)) {
                     let westNorthHeuristicPoint = getHeuristicPoint(grid[currentNode.row - 1][currentNode.col - 1], currentWestNorthVision, currentNode, grid, maxRow, maxCol)
                     if (westNorthHeuristicPoint !== null) {
@@ -210,11 +202,9 @@ const getVision = (currentNode, grid, maxRow, maxCol) => {
                     [-2,-3],
                     [0,-1]
                 ]
-                let currentWestVision = westSignArr.filter(sign => {
-                    if (currentNode.vision.find(item => item[0] === sign[0] + currentNode.row && item[1] === sign[1] + currentNode.col)) {
-                        return sign
-                    }
-                })
+                let currentWestVision = westSignArr.filter(sign => 
+                    currentNode.vision.find(item => item[0] === sign[0] + currentNode.row && item[1] === sign[1] + currentNode.col)
+                )
                 if (isSafe(currentNode.row, currentNode.col - 1, maxRow, maxCol)) {
                     let westHeuristicPoint = getHeuristicPoint(grid[currentNode.row][currentNode.col - 1], currentWestVision, currentNode, grid, maxRow, maxCol)
                     if (westHeuristicPoint !== null) {
@@ -236,11 +226,9 @@ const getVision = (currentNode, grid, maxRow, maxCol) => {
                     [2,-3],
                     [1,-1]
                 ]
-                let currentWestSouthVision = westSouthSignArr.filter(sign => {
-                    if (currentNode.vision.find(item => item[0] === sign[0] + currentNode.row && item[1] === sign[1] + currentNode.col)) {
-                        return sign
-                    }
-                })
+                let currentWestSouthVision = westSouthSignArr.filter(sign => 
+                    currentNode.vision.find(item => item[0] === sign[0] + currentNode.row && item[1] === sign[1] + currentNode.col)
+                )
                 if (isSafe(currentNode.row + 1, currentNode.col - 1, maxRow, maxCol)) {
                     let westSouthHeuristicPoint = getHeuristicPoint(grid[currentNode.row + 1 ][currentNode.col - 1], currentWestSouthVision, currentNode, grid, maxRow, maxCol)
                     if (westSouthHeuristicPoint !== null) {
@@ -262,11 +250,9 @@ const getVision = (currentNode, grid, maxRow, maxCol) => {
                     [3,-2],
                     [1,0]
                 ]
-                let currentSouthVision = southSignArr.filter(sign => {
-                    if (currentNode.vision.find(item => item[0] === sign[0] + currentNode.row && item[1] === sign[1] + currentNode.col)) {
-                        return sign
-                    }
-                })
+                let currentSouthVision = southSignArr.filter(sign => 
+                    currentNode.vision.find(item => item[0] === sign[0] + currentNode.row && item[1] === sign[1] + currentNode.col)
+                )
                 if (isSafe(currentNode.row + 1, currentNode.col, maxRow, maxCol)) {
                     let southHeuristicPoint = getHeuristicPoint(grid[currentNode.row + 1][currentNode.col], currentSouthVision, currentNode, grid, maxRow, maxCol)
                     if (southHeuristicPoint !== null) {
@@ -288,11 +274,9 @@ const getVision = (currentNode, grid, maxRow, maxCol) => {
                     [3,2],
                     [1,1]
                 ]
-                let currentEastSouthVision = eastSouthSignArr.filter(sign => {
-                    if (currentNode.vision.find(item => item[0] === sign[0] + currentNode.row && item[1] === sign[1] + currentNode.col)) {
-                        return sign
-                    }
-                })
+                let currentEastSouthVision = eastSouthSignArr.filter(sign => 
+                    currentNode.vision.find(item => item[0] === sign[0] + currentNode.row && item[1] === sign[1] + currentNode.col)
+                )
                 if (isSafe(currentNode.row + 1, currentNode.col + 1, maxRow, maxCol)) {
                     let eastSouthHeuristicPoint = getHeuristicPoint(grid[currentNode.row + 1][currentNode.col + 1], currentEastSouthVision, currentNode, grid, maxRow, maxCol)
                     if (eastSouthHeuristicPoint !== null) {
@@ -306,9 +290,10 @@ const getVision = (currentNode, grid, maxRow, maxCol) => {
     }
     // debugger
     let output = decisionQueue.sort((item1, item2) => (item1[2] > item2[2]) ? 1 :  ((item1[2] < item2[2])? -1 : 0))[decisionQueue.length - 1];
-    console.log(decisionQueue)
     return output
 }
+
+
 
 const findTarget = (grid, currentNode, backTrackTour, stepCount, remainingHider, maxRow, maxCol) => {
     let curNode = currentNode
@@ -317,18 +302,17 @@ const findTarget = (grid, currentNode, backTrackTour, stepCount, remainingHider,
          if (remainingHider === 0 ) {
             return backTrackTour
         }
-        if (curNode.isFinish || stepCount  === maxRow * maxCol) {
+        if (curNode.isFinish && !curNode.isFound) {
             remainingHider -= 1
             backTrackTour.push(curNode)
             curNode.isVisited = true
-            // return backTrackTour
+            curNode.point = 0
+            curNode.isFound = true
         }
         effectEachMove(curNode, grid, maxRow, maxCol)
         let decision = getVision(curNode, grid, maxRow, maxCol)
-        // console.log(decision)
         backTrackTour.push(curNode)
         curNode = grid[curNode.row + decision[0]][curNode.col + decision[1]]
     }
-    console.log(grid, 'grid')
     return backTrackTour
 }
