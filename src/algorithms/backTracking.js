@@ -1,4 +1,5 @@
-import { visionLogic } from "../helper/visionLogic"
+import { visionLogicFinder } from "../helper/visionLogicFinder"
+import { visionLogicHider } from "../helper/visionLogicHider"
 
 let stepX = [1,0,-1,0,1,1,-1,-1]
 let stepY = [0,1,0,-1,1,-1,1, 1]
@@ -6,7 +7,8 @@ export function backTrack(grid, startNode, maxRow, maxCol, remainingHiders) {
     var backTrackTour = []
     var hidingTours = initHidingTour(remainingHiders)
     generateHeuristicMap(grid, maxRow, maxCol)
-    visionLogic(grid,maxRow,maxCol)
+    visionLogicFinder(grid,maxRow,maxCol)
+    visionLogicHider(grid,maxRow,maxCol)
     console.log(grid)
     if (findTarget(grid, startNode, backTrackTour, hidingTours ,0, remainingHiders,maxRow, maxCol)) {
       console.log(backTrackTour)

@@ -16,6 +16,15 @@
   height: 25px;
 }
 
+.seenHider {
+  position: absolute;
+  display: block;
+  background-color: rgba(41, 173, 212, 0.342);
+  z-index: 1;
+  width: 25px;
+  height: 25px;
+}
+
 .unseen {
   display: none;
 }
@@ -44,7 +53,6 @@
     /* transform: scale(0.3); */
     background-color: rgba(0, 0, 66, 0.75);
     /* border-radius: 100%; */
-
   }
 
   50% {
@@ -69,6 +77,3 @@
 .node-wall {
   background-color: rgb(255, 255, 255);
 }
-
-
-

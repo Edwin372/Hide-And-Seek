@@ -79,11 +79,10 @@ export default class PathfindingVisualizer extends Component {
           let prevNodeElement = document.getElementById(
             `node-${prevNode.row}-${prevNode.col}`
           );
-          
-          this.animateVision(node.vision, prevNode.vision)
+
+          this.animateVision(node.vision, prevNode.vision);
           prevNodeElement.className = "node node";
           currentNodeElement.className = "node node-start";
-
         }, 125 * i);
       }
     }
@@ -102,9 +101,9 @@ export default class PathfindingVisualizer extends Component {
           );
           let prevNodeElement = document.getElementById(
             `node-${prevNode.row}-${prevNode.col}`
-          ); 
+          );
           prevNodeElement.className = "node";
-
+          this.animateVisionHider(node.visionHider, prevNode.visionHider);
           currentNodeElement.className = "node node-finish";
         }, 125 * i);
       }
@@ -114,24 +113,54 @@ export default class PathfindingVisualizer extends Component {
   animateVision(curVision, prevVision) {
     // console.log(curVision, prevVision);
     prevVision.forEach((item) => {
-      document.getElementById( `node-${item[0]}-${item[1]}`).childNodes[0].className = 'unseen'
-    })
+      document.getElementById(
+        `node-${item[0]}-${item[1]}`
+      ).childNodes[0].className = "unseen";
+    });
     curVision.forEach((item) => {
-      document.getElementById( `node-${item[0]}-${item[1]}`).childNodes[0].className = 'seen'
-    })
+      document.getElementById(
+        `node-${item[0]}-${item[1]}`
+      ).childNodes[0].className = "seen";
+    });
+  }
+
+  animateVisionHider(curVision, prevVision) {
+    // console.log(curVision, prevVision);
+    prevVision.forEach((item) => {
+      document.getElementById(
+        `node-${item[0]}-${item[1]}`
+      ).childNodes[0].className = "unseen";
+    });
+    curVision.forEach((item) => {
+      document.getElementById(
+        `node-${item[0]}-${item[1]}`
+      ).childNodes[0].className = "seenHider";
+    });
   }
 
   visualizeBackTracking() {
-    const { grid, startNodeRow, startNodeCol, maxRow, maxCol, finishNodes} = this.state;
+    const {
+      grid,
+      startNodeRow,
+      startNodeCol,
+      maxRow,
+      maxCol,
+      finishNodes,
+    } = this.state;
     // console.log(finishNodes)
     this.setState({ gameStarted: true });
     const startNode = grid[startNodeRow][startNodeCol];
-    const {backTrackTour, hidingTours} = backTrack(grid, startNode, maxRow, maxCol, finishNodes);
+    const { backTrackTour, hidingTours } = backTrack(
+      grid,
+      startNode,
+      maxRow,
+      maxCol,
+      finishNodes
+    );
     hidingTours.forEach((hidingTour) => {
-      this.animateHidingTour(hidingTour)
-    })
+      this.animateHidingTour(hidingTour);
+    });
     this.animateBackTrackTour(backTrackTour);
-    
   }
 
   getInitialGrid = () => {
@@ -157,7 +186,7 @@ export default class PathfindingVisualizer extends Component {
       isWall: false,
       previousNode: null,
       point: 0,
-      visitTime: 0
+      visitTime: 0,
     };
     switch (nodeType) {
       case 0:
@@ -181,9 +210,14 @@ export default class PathfindingVisualizer extends Component {
           point: 1000000,
         };
         this.setState((state) => {
-          return {finishNodes: [...state.finishNodes, { row: newNode.row,col: newNode.col}]}
-        })
-        return newNode
+          return {
+            finishNodes: [
+              ...state.finishNodes,
+              { row: newNode.row, col: newNode.col },
+            ],
+          };
+        });
+        return newNode;
       default:
         return node;
     }
@@ -200,11 +234,9 @@ export default class PathfindingVisualizer extends Component {
       };
       newGrid[row][col] = newNode;
       return newGrid;
-    } 
-    return newGrid
+    }
+    return newGrid;
   };
-
-  
 
   render() {
     const { grid, mouseIsPressed, gameStarted } = this.state;
