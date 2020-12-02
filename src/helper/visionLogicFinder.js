@@ -1,6 +1,6 @@
 import {isSafe} from "../algorithms/backTracking"
 
-export const visionLogic = (grid, maxRow, maxCol) => {
+export const visionLogicFinder = (grid, maxRow, maxCol) => {
     // console.log(grid[0],'tester')
     console.log(maxRow,' ',maxCol)
     grid.forEach((row) => {
@@ -44,7 +44,7 @@ const checkVerticle = (grid,node,maxRow,maxCol) => {
                 for (let j = -3; j<i; j++){
                     if(isSafe(node.row + j,node.col,maxRow,maxCol))
                         node.vision.push(grid[node.row + j][node.col]);//North
-                    if(isSafe(node.row+j,node.col+j-i,maxRow,maxCol) && i>-3)
+                    if(isSafe(node.row+j,node.col+j-i,maxRow,maxCol))
                         node.vision.push(grid[node.row+j][node.col+j-i]);//NorthWest
                     if(isSafe(node.row+j,node.col-j+i,maxRow,maxCol))
                         node.vision.push(grid[node.row+j][node.col-j+i]);//NorthEast
