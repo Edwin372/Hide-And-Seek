@@ -14,7 +14,7 @@ export default class PathfindingVisualizer extends Component {
       inputData: [],
       startNodeRow: 0,
       startNodeCol: 0,
-      finishNodes: 0,
+      finishNodes: [],
       maxRow: 0,
       maxCol: 0,
     };
@@ -79,10 +79,33 @@ export default class PathfindingVisualizer extends Component {
           let prevNodeElement = document.getElementById(
             `node-${prevNode.row}-${prevNode.col}`
           );
-          currentNodeElement.className = "node node-start";
+          
           this.animateVision(node.vision, prevNode.vision)
-          prevNodeElement.className = "node node-visited";
+          prevNodeElement.className = "node node";
+          currentNodeElement.className = "node node-start";
 
+        }, 125 * i);
+      }
+    }
+  }
+
+  animateHidingTour(hidingTour) {
+    for (let i = 1; i <= hidingTour.length; i++) {
+      if (i === hidingTour.length) {
+      } else {
+        const node = hidingTour[i];
+        const prevNode = hidingTour[i - 1];
+
+        setTimeout(() => {
+          let currentNodeElement = document.getElementById(
+            `node-${node.row}-${node.col}`
+          );
+          let prevNodeElement = document.getElementById(
+            `node-${prevNode.row}-${prevNode.col}`
+          ); 
+          prevNodeElement.className = "node";
+
+          currentNodeElement.className = "node node-finish";
         }, 125 * i);
       }
     }
@@ -96,16 +119,19 @@ export default class PathfindingVisualizer extends Component {
     curVision.forEach((item) => {
       document.getElementById( `node-${item[0]}-${item[1]}`).childNodes[0].className = 'seen'
     })
-   
   }
 
   visualizeBackTracking() {
     const { grid, startNodeRow, startNodeCol, maxRow, maxCol, finishNodes} = this.state;
-    console.log(finishNodes)
+    // console.log(finishNodes)
     this.setState({ gameStarted: true });
     const startNode = grid[startNodeRow][startNodeCol];
-    const backTrackTour = backTrack(grid, startNode, maxRow, maxCol, finishNodes);
+    const {backTrackTour, hidingTours} = backTrack(grid, startNode, maxRow, maxCol, finishNodes);
+    hidingTours.forEach((hidingTour) => {
+      this.animateHidingTour(hidingTour)
+    })
     this.animateBackTrackTour(backTrackTour);
+    
   }
 
   getInitialGrid = () => {
@@ -130,8 +156,8 @@ export default class PathfindingVisualizer extends Component {
       isVisited: false,
       isWall: false,
       previousNode: null,
-      isFound: false,
       point: 0,
+      visitTime: 0
     };
     switch (nodeType) {
       case 0:
@@ -149,14 +175,15 @@ export default class PathfindingVisualizer extends Component {
           isStart: true,
         };
       case 3:
-        this.setState((state) => {
-          return {finishNodes: state.finishNodes + 1}
-        })
-        return {
+        const newNode = {
           ...node,
           isFinish: true,
-          point: 100000,
+          point: 1000000,
         };
+        this.setState((state) => {
+          return {finishNodes: [...state.finishNodes, { row: newNode.row,col: newNode.col}]}
+        })
+        return newNode
       default:
         return node;
     }
@@ -165,20 +192,22 @@ export default class PathfindingVisualizer extends Component {
   getNewGridWithWallToggled = (grid, row, col) => {
     const newGrid = grid.slice();
     const node = newGrid[row][col];
-    const newNode = {
-      ...node,
-      isWall: !node.isWall,
-      point: 0,
-    };
-    newGrid[row][col] = newNode;
-    return newGrid;
+    if (!node.isFinish) {
+      const newNode = {
+        ...node,
+        isWall: !node.isWall,
+        point: 0,
+      };
+      newGrid[row][col] = newNode;
+      return newGrid;
+    } 
+    return newGrid
   };
 
   
 
   render() {
     const { grid, mouseIsPressed, gameStarted } = this.state;
-
     return (
       <>
         <button onClick={() => this.visualizeBackTracking()}>Visualize!</button>
