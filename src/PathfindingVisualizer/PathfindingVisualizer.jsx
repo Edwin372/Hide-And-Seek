@@ -71,7 +71,6 @@ export default class PathfindingVisualizer extends Component {
       } else {
         const node = backTrackTour[i];
         const prevNode = backTrackTour[i - 1];
-
         setTimeout(() => {
           let currentNodeElement = document.getElementById(
             `node-${node.row}-${node.col}`
@@ -82,6 +81,7 @@ export default class PathfindingVisualizer extends Component {
 
           this.animateVision(node.vision, prevNode.vision);
           prevNodeElement.className = "node node";
+          this.animateVision(node.vision, prevNode.vision)
           currentNodeElement.className = "node node-start";
         }, 125 * i);
       }

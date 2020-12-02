@@ -5,12 +5,13 @@ let stepX = [1,0,-1,0,1,1,-1,-1]
 let stepY = [0,1,0,-1,1,-1,1, 1]
 export function backTrack(grid, startNode, maxRow, maxCol, remainingHiders) {
     var backTrackTour = []
-    var hidingTours = initHidingTour(remainingHiders)
+    var hidingTours = initTour(remainingHiders)
+    var announcePositions = initTour(remainingHiders)
     generateHeuristicMap(grid, maxRow, maxCol)
     visionLogicFinder(grid,maxRow,maxCol)
     visionLogicHider(grid,maxRow,maxCol)
     console.log(grid)
-    if (findTarget(grid, startNode, backTrackTour, hidingTours ,0, remainingHiders,maxRow, maxCol)) {
+    if (findTarget(grid, startNode, backTrackTour, hidingTours, announcePositions, 0, remainingHiders, maxRow, maxCol)) {
       console.log(backTrackTour)
       console.log(hidingTours)
       return {backTrackTour, hidingTours}
@@ -300,7 +301,7 @@ const getVision = (currentNode, grid, maxRow, maxCol) => {
     return output
 }
 
-const initHidingTour = (hiders) => {
+const initTour = (hiders) => {
     let hidingTours = []
     hiders.forEach(() => {
         hidingTours.push([])
@@ -309,9 +310,14 @@ const initHidingTour = (hiders) => {
 }
 
 
-const hide = (hiders, grid, maxRow, maxCol, hidingTours) => {
-    console.log('gothere')
 
+
+const hide = (hiders, grid, maxRow, maxCol, hidingTours, stepCount, announcePositions) => {
+    // console.log(stepCount)
+    if (stepCount % 100 === 0) {
+        console.log(stepCount)
+        anouncePos(grid, announcePositions)
+    }
     hiders.forEach((hider, index) => {
         let stepIndex = Math.floor(Math.random() * 8)  
         if (
@@ -334,12 +340,19 @@ const hide = (hiders, grid, maxRow, maxCol, hidingTours) => {
 
 }
 
+const anouncePos = (grid, announcePositions, remainingHiders) => {
+    let announcePosX = Math.floor(Math.random() * 6) - 3 
+    let announcePosY = Math.floor(Math.random() * 6) - 3 
+    console.log(announcePositions)
+    console.log(announcePosX, announcePosY)
+    return 
+}
 
-const findTarget = (grid, currentNode, backTrackTour, hidingTours, stepCount, remainingHiders, maxRow, maxCol) => {
+const findTarget = (grid, currentNode, backTrackTour, hidingTours, announcePositions,stepCount, remainingHiders, maxRow, maxCol) => {
     let curNode = currentNode
     while (remainingHiders.length > 0) {
-
-        hide(remainingHiders, grid, maxRow, maxCol, hidingTours)
+      
+        hide(remainingHiders, grid, maxRow, maxCol, hidingTours, stepCount, announcePositions)
         if (stepCount  > 9000) {
             alert('your target can not be found')
             return
@@ -351,13 +364,13 @@ const findTarget = (grid, currentNode, backTrackTour, hidingTours, stepCount, re
         }
         if (curNode.isFinish) {
             const index = remainingHiders.findIndex(item => item.row === curNode.row && item.col === curNode.col);
-            
-            if (index > -1) {
-                remainingHiders.splice(index, 1);
-            }
             curNode.isVisited = true
             curNode.point = 2
             curNode.isFinish = false
+            if (index > -1) {
+                remainingHiders.splice(index, 1);
+            }
+            
             // backTrackTour.push(curNode)
         }
         effectEachMove(curNode, grid, maxRow, maxCol)
