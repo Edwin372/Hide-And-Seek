@@ -8,33 +8,43 @@
 }
 
 .seen {
+  /* transition: all 0.5s; */
   position: absolute;
   display: block;
-  background-color: rgba(233, 203, 105, 0.342);
+  background-color: rgba(233, 203, 105, 0.185);
   z-index: 1;
   width: 25px;
   height: 25px;
 }
 
 .seenHider {
+  /* transition: all 0.5s; */
   position: absolute;
   display: block;
-  background-color: rgba(41, 173, 212, 0.342);
+  background-color: rgba(41, 173, 212, 0.185);
   z-index: 1;
   width: 25px;
   height: 25px;
 }
 
 .unseen {
-  display: none;
+  /* transition: all 0.5s; */
+  opacity: 0;
 }
 
 .node-finish {
-  background-color: red;
+  background-image: url(../../images/hider.png);
+  background-size: 30px;
 }
 
 .node-start {
-  background-color: #05cc05;
+  background-image: url(../../images/seeker.png);
+  background-size: 30px;
+}
+
+.node-dead-body {
+  background-image: url(../../images/deadBody.png);
+  background-size: 30px;
 }
 
 .node-visited {

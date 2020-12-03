@@ -71,6 +71,7 @@ export default class PathfindingVisualizer extends Component {
       } else {
         const node = backTrackTour[i];
         const prevNode = backTrackTour[i - 1];
+
         setTimeout(() => {
           let currentNodeElement = document.getElementById(
             `node-${node.row}-${node.col}`
@@ -80,9 +81,13 @@ export default class PathfindingVisualizer extends Component {
           );
 
           this.animateVision(node.vision, prevNode.vision);
-          prevNodeElement.className = "node node";
-          this.animateVision(node.vision, prevNode.vision)
-          currentNodeElement.className = "node node-start";
+          if (prevNodeElement.className !== 'node node-dead-body') {
+            prevNodeElement.className = "node";
+          }
+          if (currentNodeElement.className !== 'node node-dead-body') {
+            currentNodeElement.className = "node node-start";
+            this.animateVision(node.vision, prevNode.vision);
+          }
         }, 125 * i);
       }
     }
@@ -94,7 +99,8 @@ export default class PathfindingVisualizer extends Component {
       } else {
         const node = hidingTour[i];
         const prevNode = hidingTour[i - 1];
-
+        // console.log(node.row, node.col)
+        
         setTimeout(() => {
           let currentNodeElement = document.getElementById(
             `node-${node.row}-${node.col}`
@@ -102,9 +108,20 @@ export default class PathfindingVisualizer extends Component {
           let prevNodeElement = document.getElementById(
             `node-${prevNode.row}-${prevNode.col}`
           );
-          prevNodeElement.className = "node";
-          this.animateVisionHider(node.visionHider, prevNode.visionHider);
-          currentNodeElement.className = "node node-finish";
+         
+          if (prevNodeElement.className !== 'node node-dead-body') {
+            prevNodeElement.className = "node";
+          }
+          if (i === hidingTour.length - 1) {
+            currentNodeElement.className = "node node-dead-body";
+          } else {
+            if (currentNodeElement.className !== 'node node-dead-body') {
+              currentNodeElement.className = "node node-finish";
+              this.animateVisionHider(node.visionHider, prevNode.visionHider);
+            }
+          }
+          
+         
         }, 125 * i);
       }
     }
@@ -125,16 +142,27 @@ export default class PathfindingVisualizer extends Component {
   }
 
   animateVisionHider(curVision, prevVision) {
-    // console.log(curVision, prevVision);
     prevVision.forEach((item) => {
-      document.getElementById(
-        `node-${item[0]}-${item[1]}`
-      ).childNodes[0].className = "unseen";
+      if (
+        document.getElementById(`node-${item[0]}-${item[1]}`).childNodes[0].className !== 'seen'
+        // document.getElementById(`node-${item[0]}-${item[1]}`).childNodes[0].className !== 'seenHider'
+      ) {
+        document.getElementById(
+          `node-${item[0]}-${item[1]}`
+        ).childNodes[0].className = "unseen";
+      }
+     
     });
+    
     curVision.forEach((item) => {
+      if (
+        document.getElementById(`node-${item[0]}-${item[1]}`).childNodes[0].className === 'unseen'
+        // document.getElementById(`node-${item[0]}-${item[1]}`).childNodes[0].className !== 'seenHider'
+      ) {
       document.getElementById(
         `node-${item[0]}-${item[1]}`
       ).childNodes[0].className = "seenHider";
+      }
     });
   }
 
@@ -157,10 +185,11 @@ export default class PathfindingVisualizer extends Component {
       maxCol,
       finishNodes
     );
+    this.animateBackTrackTour(backTrackTour);
     hidingTours.forEach((hidingTour) => {
       this.animateHidingTour(hidingTour);
     });
-    this.animateBackTrackTour(backTrackTour);
+    
   }
 
   getInitialGrid = () => {
@@ -213,7 +242,7 @@ export default class PathfindingVisualizer extends Component {
           return {
             finishNodes: [
               ...state.finishNodes,
-              { row: newNode.row, col: newNode.col },
+              { row: newNode.row, col: newNode.col, index: state.finishNodes.length },
             ],
           };
         });

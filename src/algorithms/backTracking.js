@@ -1,5 +1,6 @@
 import { visionLogicFinder } from "../helper/visionLogicFinder"
 import { visionLogicHider } from "../helper/visionLogicHider"
+import calculateMinEuclidDistance from '../helper/calculateEuclidDistance'
 
 let stepX = [1,0,-1,0,1,1,-1,-1]
 let stepY = [0,1,0,-1,1,-1,1, 1]
@@ -30,12 +31,8 @@ const generateHeuristicMap = (grid, maxRow, maxCol) => {
                 for (let i = 0; i < 4; i++) {
                     if (isSafe(currentNode.row + stepY[i], currentNode.col + stepX[i], maxRow, maxCol) ) {
                         if (!grid[currentNode.row + stepY[i]][currentNode.col + stepX[i]].isWall) {
-                            // console.log(currentNode.row, currentNode.col,i)
                             grid[currentNode.row + stepY[i]][currentNode.col + stepX[i]].point += 1
-                          
                         }
-                       
-                       
                     }
                 }
             }
@@ -65,30 +62,23 @@ const effectEachMove = (currentNode,grid, maxRow, maxCol)  => {
     currentNode.isVisited = true
     currentNode.point -= 2
     currentNode.visitTime += 1
-    // currentNode.vision.forEach(item => {
-    //     // grid[item[0]][item[1]].point = +1
-    // })
 }
+
 const getHeuristicPoint = (nextNode, signArr, currentNode, grid, maxRow, maxCol) => {
     // console.log(nextNode, currentNode)
     if ((nextNode && nextNode.isWall === true) || !nextNode ) {
         return null
     }
     else {
-        
         if (currentNode) {
             let seenNodes = getSeenNode(currentNode, grid, signArr, maxRow, maxCol)
-            // if (seenNodes.find(node => node.point > -20)) {
-            //     seenNodes = seenNodes.filter(node => node.point > -5)
-            // }
             let heuristicPoint = seenNodes.reduce((sum, seenNode) => sum + seenNode.point, 0)
-            // console.log(heuristicPoint)
             return heuristicPoint
         }
     }
 }
 
-const getVision = (currentNode, grid, maxRow, maxCol) => {
+const getDecision = (currentNode, grid, maxRow, maxCol, announcedPos) => {
     let decisionQueue = []
     let direction = {
         'East': 0,
@@ -119,8 +109,10 @@ const getVision = (currentNode, grid, maxRow, maxCol) => {
                 )
                 if (isSafe(currentNode.row, currentNode.col + 1, maxRow, maxCol)) {
                     let eastHeuristicPoint = getHeuristicPoint(grid[currentNode.row][currentNode.col + 1], currentEastVision, currentNode, grid, maxRow, maxCol)
+                    let eastEuclidDistance = calculateMinEuclidDistance({row: currentNode.row , col: currentNode.col + 1}, announcedPos)
+
                     if (eastHeuristicPoint !== null) {
-                        decisionQueue.push([0 , 1, eastHeuristicPoint, grid[currentNode.row][currentNode.col + 1].visitTime])
+                        decisionQueue.push([0 , 1, eastHeuristicPoint, grid[currentNode.row][currentNode.col + 1].visitTime, eastEuclidDistance])
                         break
                     }
                 }
@@ -143,8 +135,9 @@ const getVision = (currentNode, grid, maxRow, maxCol) => {
                 )
                 if (isSafe(currentNode.row - 1, currentNode.col + 1, maxRow, maxCol)) {
                     let eastNorthHeuristicPoint = getHeuristicPoint(grid[currentNode.row - 1][currentNode.col + 1], currentEastNorthVision, currentNode, grid, maxRow, maxCol)
+                    let eastNorthEuclidDistance = calculateMinEuclidDistance({row: currentNode.row - 1, col: currentNode.col + 1}, announcedPos)
                     if (eastNorthHeuristicPoint !== null) {
-                        decisionQueue.push([-1, 1, eastNorthHeuristicPoint, grid[currentNode.row - 1][currentNode.col + 1].visitTime])
+                        decisionQueue.push([-1, 1, eastNorthHeuristicPoint, grid[currentNode.row - 1][currentNode.col + 1].visitTime,eastNorthEuclidDistance])
                         break
                     }
                 }
@@ -167,8 +160,9 @@ const getVision = (currentNode, grid, maxRow, maxCol) => {
                 )
                 if (isSafe(currentNode.row - 1, currentNode.col , maxRow, maxCol)) {
                     let northHeuristicPoint = getHeuristicPoint( grid[currentNode.row - 1][currentNode.col], currentNorthVision, currentNode, grid, maxRow, maxCol)
+                    let northEuclidDistance = calculateMinEuclidDistance({row: currentNode.row - 1, col: currentNode.col}, announcedPos)
                     if (northHeuristicPoint !== null) {
-                        decisionQueue.push([-1, 0, northHeuristicPoint, grid[currentNode.row - 1][currentNode.col].visitTime])
+                        decisionQueue.push([-1, 0, northHeuristicPoint, grid[currentNode.row - 1][currentNode.col].visitTime, northEuclidDistance])
                         break
                     }
                 }
@@ -191,8 +185,9 @@ const getVision = (currentNode, grid, maxRow, maxCol) => {
                 )
                 if (isSafe(currentNode.row - 1, currentNode.col - 1, maxRow, maxCol)) {
                     let westNorthHeuristicPoint = getHeuristicPoint(grid[currentNode.row - 1][currentNode.col - 1], currentWestNorthVision, currentNode, grid, maxRow, maxCol)
+                    let westNorthEuclidDistance = calculateMinEuclidDistance({row: currentNode.row - 1, col: currentNode.col - 1}, announcedPos)
                     if (westNorthHeuristicPoint !== null) {
-                        decisionQueue.push([-1 , -1, westNorthHeuristicPoint, grid[currentNode.row - 1][currentNode.col - 1].visitTime])
+                        decisionQueue.push([-1 , -1, westNorthHeuristicPoint, grid[currentNode.row - 1][currentNode.col - 1].visitTime, westNorthEuclidDistance])
                         break
                     }
                 }
@@ -214,8 +209,9 @@ const getVision = (currentNode, grid, maxRow, maxCol) => {
                 )
                 if (isSafe(currentNode.row, currentNode.col - 1, maxRow, maxCol)) {
                     let westHeuristicPoint = getHeuristicPoint(grid[currentNode.row][currentNode.col - 1], currentWestVision, currentNode, grid, maxRow, maxCol)
+                    let westEuclidDistance = calculateMinEuclidDistance({row: currentNode.row, col: currentNode.col - 1}, announcedPos)
                     if (westHeuristicPoint !== null) {
-                        decisionQueue.push([0 , -1, westHeuristicPoint, grid[currentNode.row][currentNode.col - 1].visitTime])
+                        decisionQueue.push([0 , -1, westHeuristicPoint, grid[currentNode.row][currentNode.col - 1].visitTime, westEuclidDistance])
                         break
                     }
                 }
@@ -238,8 +234,9 @@ const getVision = (currentNode, grid, maxRow, maxCol) => {
                 )
                 if (isSafe(currentNode.row + 1, currentNode.col - 1, maxRow, maxCol)) {
                     let westSouthHeuristicPoint = getHeuristicPoint(grid[currentNode.row + 1 ][currentNode.col - 1], currentWestSouthVision, currentNode, grid, maxRow, maxCol)
+                    let westSouthEuclidDistance = calculateMinEuclidDistance({row: currentNode.row + 1, col: currentNode.col - 1}, announcedPos)
                     if (westSouthHeuristicPoint !== null) {
-                        decisionQueue.push([ 1, -1, westSouthHeuristicPoint, grid[currentNode.row + 1][currentNode.col - 1].visitTime])
+                        decisionQueue.push([ 1, -1, westSouthHeuristicPoint, grid[currentNode.row + 1][currentNode.col - 1].visitTime, westSouthEuclidDistance])
                         break
                     }
                 }
@@ -262,8 +259,9 @@ const getVision = (currentNode, grid, maxRow, maxCol) => {
                 )
                 if (isSafe(currentNode.row + 1, currentNode.col, maxRow, maxCol)) {
                     let southHeuristicPoint = getHeuristicPoint(grid[currentNode.row + 1][currentNode.col], currentSouthVision, currentNode, grid, maxRow, maxCol)
+                    let southEuclidDistance = calculateMinEuclidDistance({row: currentNode.row + 1, col: currentNode.col}, announcedPos)
                     if (southHeuristicPoint !== null) {
-                        decisionQueue.push([1, 0, southHeuristicPoint, grid[currentNode.row + 1][currentNode.col].visitTime])
+                        decisionQueue.push([1, 0, southHeuristicPoint, grid[currentNode.row + 1][currentNode.col].visitTime, southEuclidDistance])
                         break
                     }
                 }
@@ -286,8 +284,9 @@ const getVision = (currentNode, grid, maxRow, maxCol) => {
                 )
                 if (isSafe(currentNode.row + 1, currentNode.col + 1, maxRow, maxCol)) {
                     let eastSouthHeuristicPoint = getHeuristicPoint(grid[currentNode.row + 1][currentNode.col + 1], currentEastSouthVision, currentNode, grid, maxRow, maxCol)
+                    let eastSouthEuclidDistance = calculateMinEuclidDistance({row: currentNode.row + 1, col: currentNode.col + 1}, announcedPos)
                     if (eastSouthHeuristicPoint !== null) {
-                        decisionQueue.push([ 1, 1, eastSouthHeuristicPoint, grid[currentNode.row + 1][currentNode.col + 1].visitTime])
+                        decisionQueue.push([ 1, 1, eastSouthHeuristicPoint, grid[currentNode.row + 1][currentNode.col + 1].visitTime, eastSouthEuclidDistance])
                         break
                     }
                 }
@@ -295,10 +294,13 @@ const getVision = (currentNode, grid, maxRow, maxCol) => {
             default: break
         }
     }
-    // debugger
-    // console.log( decisionQueue.sort((item1, item2) => (item1[2] > item2[2] || item1[3] < item2[3]) ? 1 :  ((item1[2] < item2[2]) || item1[3] > item2[3]? -1 : 0), currentNode.row, currentNode.col));
-    const output = decisionQueue.sort((item1, item2) => (item1[2] > item2[2] || item1[3] < item2[3]) ? 1 :  ((item1[2] < item2[2]) || item1[3] > item2[3]? -1 : 0))[decisionQueue.length - 1]
-    return output
+
+    const sortedDecision = decisionQueue
+    .sort((item1, item2) => (item1[3] < item2[3]) ? 1 : ( item1[3] > item2[3]? -1 : 0))
+    .sort((item1, item2) => (item1[4] < item2[4]) ? 1 : ( item1[4] > item2[4]? -1 : 0))
+    .sort((item1, item2) => (item1[2] > item2[2]) ? 1 : ( item1[2] < item2[2]? -1 : 0))
+    // console.log(sortedDecision)
+    return sortedDecision[decisionQueue.length - 1]
 }
 
 const initTour = (hiders) => {
@@ -309,50 +311,51 @@ const initTour = (hiders) => {
     return hidingTours
 }
 
-
-
-
-const hide = (hiders, grid, maxRow, maxCol, hidingTours, stepCount, announcePositions) => {
-    // console.log(stepCount)
-    if (stepCount % 100 === 0) {
-        console.log(stepCount)
-        anouncePos(grid, announcePositions)
+const hide = (hiders, grid, maxRow, maxCol, hidingTours, stepCount, announcedPosTour, announcedPos) => {
+    if (stepCount % 5 === 0) {
+        announcedPos.splice(0,announcedPos.length)
+        hiders.forEach(hider => {
+            anouncePos(grid, announcedPosTour, announcedPos, hider, maxRow, maxCol)
+        })
     }
-    hiders.forEach((hider, index) => {
-        let stepIndex = Math.floor(Math.random() * 8)  
+    
+    hiders.forEach((hider) => {
+        let stepIndex = Math.floor(Math.random() * 8) 
         if (
             isSafe(hider.row + stepY[stepIndex], hider.col + stepX[stepIndex], maxRow, maxCol) &&
             !grid[hider.row + stepY[stepIndex]][hider.col + stepX[stepIndex]].isWall &&
             !grid[hider.row + stepY[stepIndex]][hider.col + stepX[stepIndex]].isFinish
         ) {
-            grid[hider.row ][hider.col].isFinish = false
-            grid[hider.row ][hider.col].point = 0
+            grid[hider.row][hider.col].isFinish = false
+            grid[hider.row][hider.col].point = 0
             grid[hider.row + stepY[stepIndex]][hider.col + stepX[stepIndex]].point = 1000000
             grid[hider.row + stepY[stepIndex]][hider.col + stepX[stepIndex]].isFinish = true
-            hidingTours[index].push(grid[hider.row + stepY[stepIndex]][hider.col + stepX[stepIndex]])
+            hidingTours[hider.index].push(grid[hider.row + stepY[stepIndex]][hider.col + stepX[stepIndex]])
             hider.row  = hider.row + stepY[stepIndex]
             hider.col  = hider.col + stepX[stepIndex]
+            console.log(stepCount ,hider.row, hider.col)
         }
         else {
-            hidingTours[index].push(grid[hider.row][hider.col])
+            hidingTours[hider.index].push(grid[hider.row][hider.col])
         }
     })
-
 }
 
-const anouncePos = (grid, announcePositions, remainingHiders) => {
+const anouncePos = (grid, announcePositions, announcedPos, hider, maxRow, maxCol) => {
     let announcePosX = Math.floor(Math.random() * 6) - 3 
     let announcePosY = Math.floor(Math.random() * 6) - 3 
-    console.log(announcePositions)
-    console.log(announcePosX, announcePosY)
-    return 
+    while (!isSafe(hider.row + announcePosY, hider.col + announcePosX, maxRow, maxCol)) {
+        announcePosX = Math.floor(Math.random() * 6) - 3 
+        announcePosY = Math.floor(Math.random() * 6) - 3 
+    }
+    announcedPos.push({ row: hider.row + announcePosY, col: hider.col + announcePosX})
 }
 
-const findTarget = (grid, currentNode, backTrackTour, hidingTours, announcePositions,stepCount, remainingHiders, maxRow, maxCol) => {
+const findTarget = (grid, currentNode, backTrackTour, hidingTours, announcedPosTour,stepCount, remainingHiders, maxRow, maxCol) => {
     let curNode = currentNode
+    let announcedPos = []
     while (remainingHiders.length > 0) {
-      
-        hide(remainingHiders, grid, maxRow, maxCol, hidingTours, stepCount, announcePositions)
+       
         if (stepCount  > 9000) {
             alert('your target can not be found')
             return
@@ -363,20 +366,23 @@ const findTarget = (grid, currentNode, backTrackTour, hidingTours, announcePosit
             return backTrackTour
         }
         if (curNode.isFinish) {
+            console.log(stepCount, 'caught', curNode.row, curNode.col )
+            
             const index = remainingHiders.findIndex(item => item.row === curNode.row && item.col === curNode.col);
+            remainingHiders.forEach(item => {console.log(item)})
             curNode.isVisited = true
-            curNode.point = 2
+            curNode.point = 0
             curNode.isFinish = false
             if (index > -1) {
+                console.log(index)
                 remainingHiders.splice(index, 1);
             }
-            
-            // backTrackTour.push(curNode)
         }
         effectEachMove(curNode, grid, maxRow, maxCol)
-        let decision = getVision(curNode, grid, maxRow, maxCol)
+        let decision = getDecision(curNode, grid, maxRow, maxCol, announcedPos)
         backTrackTour.push(curNode)
         curNode = grid[curNode.row + decision[0]][curNode.col + decision[1]]
+        hide(remainingHiders, grid, maxRow, maxCol, hidingTours, stepCount, announcedPosTour, announcedPos)
     }
     return backTrackTour
 }
