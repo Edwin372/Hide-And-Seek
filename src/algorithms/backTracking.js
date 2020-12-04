@@ -9,7 +9,7 @@ export function backTrack(grid, startNode, maxRow, maxCol, remainingHiders) {
     var backTrackTour = []
     var hidingTours = initTour(remainingHiders)
     var noiseTours = initTour(remainingHiders)
-    generateHeuristicMap(grid, maxRow, maxCol)
+    // generateHeuristicMap(grid, maxRow, maxCol)
     visionLogicFinder(grid,maxRow,maxCol)
     visionLogicHider(grid,maxRow,maxCol)
     console.log(grid)

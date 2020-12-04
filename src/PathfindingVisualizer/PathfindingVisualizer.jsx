@@ -21,35 +21,47 @@ export default class PathfindingVisualizer extends Component {
     };
   }
   readFromTxtFile = (evt) => {
-    var inputData = [];
-    var inputMN = [];
-    evt.stopPropagation();
-    evt.preventDefault();
-    var files = evt.target.files;
-
-    if (files.length !== 1) {
-      return;
-    }
-    var file = files[0];
-    var fileReader = new FileReader();
-
-    fileReader.onload = (progressEvent) => {
-      var stringData = fileReader.result;
-      let str = stringData.split("\n");
-      inputMN = str[0].split(" ").map((x) => parseInt(x));
-      for (let i = 0; i < inputMN[0]; i++) {
-        let inputLine = str[i + 1].split(" ").map((x) => parseInt(x));
-        inputData.push(inputLine);
+    try {
+      var inputData = [];
+      var inputMN = [];
+      evt.stopPropagation();
+      evt.preventDefault();
+      var files = evt.target.files;
+  
+      if (files.length !== 1) {
+        return;
       }
-      this.setState({ inputData }, () => {
-        this.setState({ maxRow: inputMN[0], maxCol: inputMN[1] }, () => {
-          const grid = this.getInitialGrid(inputData);
-          this.setState({ grid , mapChosen: true});
-          
+      var file = files[0];
+      var fileReader = new FileReader();
+  
+      fileReader.onload = (progressEvent) => {
+        var stringData = fileReader.result;
+        let str = stringData.split("\n");
+        console.log(str)
+        console.log(str[0])
+        inputMN = str[0].split(" ").map((x) => parseInt(x));
+        for (let i = 0; i < inputMN[0]; i++) {
+          if (str[i+ 1]) {
+            let inputLine = str[i + 1].split(" ").map((x) => parseInt(x));
+            inputData.push(inputLine);
+          }else {
+            alert('Your map is not legit!')
+            return 
+          }
+       
+        }
+        this.setState({ inputData }, () => {
+          this.setState({ maxRow: inputMN[0], maxCol: inputMN[1] }, () => {
+            const grid = this.getInitialGrid(inputData);
+            this.setState({ grid , mapChosen: true});
+          });
         });
-      });
-    };
-    fileReader.readAsText(file, "UTF-8"); // fileReader.result -> String.
+      };
+      fileReader.readAsText(file, "UTF-8"); // fileReader.result -> String.
+    } catch (err) {
+      alert('your map is not legit!')
+    }
+    
   };
 
   handleMouseDown(row, col) {
