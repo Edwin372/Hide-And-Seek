@@ -2,6 +2,7 @@ import { visionLogicFinder } from "../helper/visionLogicFinder"
 import { visionLogicHider } from "../helper/visionLogicHider"
 import calculateMinEuclidDistance from '../helper/calculateEuclidDistance'
 
+
 let stepX = [1,0,-1,0,1,1,-1,-1]
 let stepY = [0,1,0,-1,1,-1,1, 1]
 export function backTrack(grid, startNode, maxRow, maxCol, remainingHiders) {
@@ -93,7 +94,9 @@ const getDecision = (currentNode, grid, maxRow, maxCol, announcedPos) => {
     }
     for (let item in direction) {
         switch (item) {
+
             case 'East': 
+                //east vision
                 let eastSignArr = [
                     [0,2],
                     [0,3],
@@ -105,13 +108,16 @@ const getDecision = (currentNode, grid, maxRow, maxCol, announcedPos) => {
                     [2,3],
                     [0,1]
                 ]
+                // find intesect part bettween east vision and current node 's vision array
                 let currentEastVision = eastSignArr.filter(sign => 
                     currentNode.vision.find(item => item[0] === sign[0] + currentNode.row && item[1] === sign[1] + currentNode.col)
                 )
+                // if east step is reachable
                 if (isSafe(currentNode.row, currentNode.col + 1, maxRow, maxCol)) {
+                    // calculate euclid distance and heuristic point
                     let eastHeuristicPoint = getHeuristicPoint(grid[currentNode.row][currentNode.col + 1], currentEastVision, currentNode, grid, maxRow, maxCol)
                     let eastEuclidDistance = calculateMinEuclidDistance({row: currentNode.row , col: currentNode.col + 1}, announcedPos)
-
+                    // in case heuristic point of next move is null (this happen when east step meet wall or edge of the map)
                     if (eastHeuristicPoint !== null) {
                         decisionQueue.push([0 , 1, eastHeuristicPoint, grid[currentNode.row][currentNode.col + 1].visitTime, eastEuclidDistance])
                         break
@@ -295,12 +301,13 @@ const getDecision = (currentNode, grid, maxRow, maxCol, announcedPos) => {
             default: break
         }
     }
-
+    // arrange decision queue  in order of priority vision heuristic point, euclid distance, number of visited times respectively
     const finalDecision = decisionQueue
     .sort((item1, item2) => (item1[3] < item2[3]) ? 1 : ( item1[3] > item2[3]? -1 : 0))
     .sort((item1, item2) => (item1[4] < item2[4]) ? 1 : ( item1[4] > item2[4]? -1 : 0))
     .sort((item1, item2) => (item1[2] > item2[2]) ? 1 : ( item1[2] < item2[2]? -1 : 0))[decisionQueue.length - 1]
     // console.log(sortedDecision)
+    // choose the best option after sorted
     return finalDecision
 }
 
@@ -359,7 +366,7 @@ const findTarget = (grid, currentNode, backTrackTour, hidingTours, announcedPosT
        
         if (stepCount  > 9000) {
             alert('your target can not be found')
-            return
+            return []
         }
         // console.log('gothere')
         stepCount +=1

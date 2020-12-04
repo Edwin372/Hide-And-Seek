@@ -9,6 +9,7 @@ export default class PathfindingVisualizer extends Component {
     super();
     this.state = {
       gameStarted: false,
+      mapChosen: false,
       grid: [],
       mouseIsPressed: false,
       inputData: [],
@@ -43,7 +44,8 @@ export default class PathfindingVisualizer extends Component {
       this.setState({ inputData }, () => {
         this.setState({ maxRow: inputMN[0], maxCol: inputMN[1] }, () => {
           const grid = this.getInitialGrid(inputData);
-          this.setState({ grid });
+          this.setState({ grid , mapChosen: true});
+          
         });
       });
     };
@@ -298,7 +300,14 @@ export default class PathfindingVisualizer extends Component {
     const { grid, mouseIsPressed, gameStarted } = this.state;
     return (
       <>
-        <button onClick={() => this.visualizeBackTracking()}>Game on!</button>
+        <button onClick={() => {
+          if (this.state.mapChosen) {
+             this.visualizeBackTracking()
+          } else {
+            alert('please choose a map from your')
+          }
+         
+        }}>Game on!</button>
         <input type="file" onChange={(e) => this.readFromTxtFile(e)}></input>
         <div className="grid">
           {grid.map((row, rowIdx) => {
