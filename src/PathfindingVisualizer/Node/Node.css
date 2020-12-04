@@ -3,7 +3,8 @@
   height: 25px;
   outline: 1px solid rgb(0, 0, 0);
   display: inline-block;
-  background: rgb(0, 0, 0);
+  background-image: url(../../images/floor3.jpeg);
+  background-size: 30px;
   position: relative;
 }
 
@@ -11,7 +12,7 @@
   /* transition: all 0.5s; */
   position: absolute;
   display: block;
-  background-color: rgba(233, 203, 105, 0.185);
+  background-color: rgba(233, 135, 105, 0.322);
   z-index: 1;
   width: 25px;
   height: 25px;
@@ -21,7 +22,7 @@
   /* transition: all 0.5s; */
   position: absolute;
   display: block;
-  background-color: rgba(41, 173, 212, 0.185);
+  background-color: rgba(41, 173, 212, 0.322);
   z-index: 1;
   width: 25px;
   height: 25px;
@@ -33,23 +34,23 @@
 }
 
 .node-finish {
-  background-image: url(../../images/hider.png);
+  background-image: url(../../images/hider.png), url(../../images//floor3.jpeg);
   background-size: 30px;
 }
 
 .node-start {
-  background-image: url(../../images/seeker.png);
+  background-image:  url(../../images/seeker.png), url(../../images//floor3.jpeg);
   background-size: 30px;
 }
 
 .node-dead-body {
-  background-image: url(../../images/deadBody.png);
+  background-image: url(../../images/deadBody.png), url(../../images//floor3.jpeg);
   background-size: 30px;
 }
 
 .node-visited {
   animation-name: visitedAnimation;
-  animation-duration: 1.5s;
+  animation-duration: 0.5s;
   animation-timing-function: ease-out;
   animation-delay: 0;
   animation-direction: alternate;
@@ -60,22 +61,26 @@
 
 @keyframes visitedAnimation {
   0% {
-    /* transform: scale(0.3); */
+    transform: scale(0.3);
+    background-image: none;
     background-color: rgba(0, 0, 66, 0.75);
-    /* border-radius: 100%; */
+    border-radius: 100%;
   }
 
   50% {
+    background-image: none;
     background-color: rgba(17, 104, 217, 0.75);
   }
 
   75% {
     transform: scale(1.2);
+    background-image: none;
     background-color: rgba(0, 217, 159, 0.75);
   }
 
   100% {
     transform: scale(1);
+    background-image: none;
     background-color: rgba(0, 190, 218, 0.75);
   }
 }
@@ -85,5 +90,8 @@
 }
 
 .node-wall {
-  background-color: rgb(255, 255, 255);
+  background-image: url(../../images/floor2.png);
+  /* background-color: rgb(255, 255, 255); */
+  background-size: 30px;
+
 }

@@ -3,7 +3,7 @@ import Node from "./Node/Node";
 import { backTrack } from "../algorithms/backTracking";
 import "./PathfindingVisualizer.css";
 // import dropHandler from "../helper/inputfromText";
-
+const DELAY_TIME = 125
 export default class PathfindingVisualizer extends Component {
   constructor() {
     super();
@@ -88,7 +88,29 @@ export default class PathfindingVisualizer extends Component {
             currentNodeElement.className = "node node-start";
             this.animateVision(node.vision, prevNode.vision);
           }
-        }, 125 * i);
+        }, DELAY_TIME * i);
+      }
+    }
+  }
+
+  animateNoiseTour(noiseTour) {
+    for (let i = 1; i <= noiseTour.length; i++) {
+      if (i === noiseTour.length) {
+      } else {
+        const node = noiseTour[i];
+        const prevNode = noiseTour[i - 1];
+
+        setTimeout(() => {
+          let currentNodeElement = document.getElementById(
+            `node-${node.row}-${node.col}`
+          );
+          let prevNodeElement = document.getElementById(
+            `node-${prevNode.row}-${prevNode.col}`
+          );
+
+            prevNodeElement.className = "node";
+            currentNodeElement.className = "node node-visited";
+        }, DELAY_TIME * 5 * i);
       }
     }
   }
@@ -122,7 +144,7 @@ export default class PathfindingVisualizer extends Component {
           }
           
          
-        }, 125 * i);
+        }, DELAY_TIME * i);
       }
     }
   }
@@ -178,7 +200,7 @@ export default class PathfindingVisualizer extends Component {
     // console.log(finishNodes)
     this.setState({ gameStarted: true });
     const startNode = grid[startNodeRow][startNodeCol];
-    const { backTrackTour, hidingTours } = backTrack(
+    const { backTrackTour, hidingTours,  noiseTours} = backTrack(
       grid,
       startNode,
       maxRow,
@@ -188,6 +210,11 @@ export default class PathfindingVisualizer extends Component {
     this.animateBackTrackTour(backTrackTour);
     hidingTours.forEach((hidingTour) => {
       this.animateHidingTour(hidingTour);
+     
+    });
+    noiseTours.forEach((noiseTour) => {
+      this.animateNoiseTour(noiseTour);
+     
     });
     
   }
@@ -271,7 +298,7 @@ export default class PathfindingVisualizer extends Component {
     const { grid, mouseIsPressed, gameStarted } = this.state;
     return (
       <>
-        <button onClick={() => this.visualizeBackTracking()}>Visualize!</button>
+        <button onClick={() => this.visualizeBackTracking()}>Game on!</button>
         <input type="file" onChange={(e) => this.readFromTxtFile(e)}></input>
         <div className="grid">
           {grid.map((row, rowIdx) => {

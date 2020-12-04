@@ -7,15 +7,16 @@ let stepY = [0,1,0,-1,1,-1,1, 1]
 export function backTrack(grid, startNode, maxRow, maxCol, remainingHiders) {
     var backTrackTour = []
     var hidingTours = initTour(remainingHiders)
-    var announcePositions = initTour(remainingHiders)
+    var noiseTours = initTour(remainingHiders)
     generateHeuristicMap(grid, maxRow, maxCol)
     visionLogicFinder(grid,maxRow,maxCol)
     visionLogicHider(grid,maxRow,maxCol)
     console.log(grid)
-    if (findTarget(grid, startNode, backTrackTour, hidingTours, announcePositions, 0, remainingHiders, maxRow, maxCol)) {
+    if (findTarget(grid, startNode, backTrackTour, hidingTours, noiseTours, 0, remainingHiders, maxRow, maxCol)) {
       console.log(backTrackTour)
       console.log(hidingTours)
-      return {backTrackTour, hidingTours}
+      console.log(noiseTours)
+      return {backTrackTour, hidingTours, noiseTours}
     } else {
       console.log(grid)
 
@@ -60,8 +61,8 @@ const getSeenNode = (currentNode, grid, signArr, maxRow, maxCol) => {
 
 const effectEachMove = (currentNode,grid, maxRow, maxCol)  => {
     currentNode.isVisited = true
-    currentNode.point -= 2
-    currentNode.visitTime += 1
+    currentNode.point -= 1
+    currentNode.visitTime += 2
 }
 
 const getHeuristicPoint = (nextNode, signArr, currentNode, grid, maxRow, maxCol) => {
@@ -295,12 +296,12 @@ const getDecision = (currentNode, grid, maxRow, maxCol, announcedPos) => {
         }
     }
 
-    const sortedDecision = decisionQueue
+    const finalDecision = decisionQueue
     .sort((item1, item2) => (item1[3] < item2[3]) ? 1 : ( item1[3] > item2[3]? -1 : 0))
     .sort((item1, item2) => (item1[4] < item2[4]) ? 1 : ( item1[4] > item2[4]? -1 : 0))
-    .sort((item1, item2) => (item1[2] > item2[2]) ? 1 : ( item1[2] < item2[2]? -1 : 0))
+    .sort((item1, item2) => (item1[2] > item2[2]) ? 1 : ( item1[2] < item2[2]? -1 : 0))[decisionQueue.length - 1]
     // console.log(sortedDecision)
-    return sortedDecision[decisionQueue.length - 1]
+    return finalDecision
 }
 
 const initTour = (hiders) => {
@@ -333,7 +334,6 @@ const hide = (hiders, grid, maxRow, maxCol, hidingTours, stepCount, announcedPos
             hidingTours[hider.index].push(grid[hider.row + stepY[stepIndex]][hider.col + stepX[stepIndex]])
             hider.row  = hider.row + stepY[stepIndex]
             hider.col  = hider.col + stepX[stepIndex]
-            console.log(stepCount ,hider.row, hider.col)
         }
         else {
             hidingTours[hider.index].push(grid[hider.row][hider.col])
@@ -344,11 +344,12 @@ const hide = (hiders, grid, maxRow, maxCol, hidingTours, stepCount, announcedPos
 const anouncePos = (grid, announcePositions, announcedPos, hider, maxRow, maxCol) => {
     let announcePosX = Math.floor(Math.random() * 6) - 3 
     let announcePosY = Math.floor(Math.random() * 6) - 3 
-    while (!isSafe(hider.row + announcePosY, hider.col + announcePosX, maxRow, maxCol)) {
+    while (!isSafe(hider.row + announcePosY, hider.col + announcePosX, maxRow, maxCol) || grid[hider.row + announcePosY][hider.col + announcePosX].isWall) {
         announcePosX = Math.floor(Math.random() * 6) - 3 
         announcePosY = Math.floor(Math.random() * 6) - 3 
     }
-    announcedPos.push({ row: hider.row + announcePosY, col: hider.col + announcePosX})
+    announcePositions[hider.index].push({row: hider.row + announcePosY, col: hider.col + announcePosX})
+    announcedPos.push({row: hider.row + announcePosY, col: hider.col + announcePosX})
 }
 
 const findTarget = (grid, currentNode, backTrackTour, hidingTours, announcedPosTour,stepCount, remainingHiders, maxRow, maxCol) => {
@@ -366,15 +367,11 @@ const findTarget = (grid, currentNode, backTrackTour, hidingTours, announcedPosT
             return backTrackTour
         }
         if (curNode.isFinish) {
-            console.log(stepCount, 'caught', curNode.row, curNode.col )
-            
             const index = remainingHiders.findIndex(item => item.row === curNode.row && item.col === curNode.col);
-            remainingHiders.forEach(item => {console.log(item)})
             curNode.isVisited = true
             curNode.point = 0
             curNode.isFinish = false
             if (index > -1) {
-                console.log(index)
                 remainingHiders.splice(index, 1);
             }
         }
