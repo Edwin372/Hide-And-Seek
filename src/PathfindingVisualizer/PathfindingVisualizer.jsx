@@ -282,7 +282,7 @@ export default class PathfindingVisualizer extends Component {
   getNewGridWithWallToggled = (grid, row, col) => {
     const newGrid = grid.slice();
     const node = newGrid[row][col];
-    if (!node.isFinish) {
+    if (!node.isFinish && !node.isStart) {
       const newNode = {
         ...node,
         isWall: !node.isWall,
