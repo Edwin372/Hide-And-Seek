@@ -8,6 +8,11 @@
   position: relative;
 }
 
+button:disabled {
+ background-color: #929292;
+ cursor: default;
+}
+
 .seen {
   /* transition: all 0.5s; */
   position: absolute;
@@ -26,6 +31,10 @@
   z-index: 1;
   width: 25px;
   height: 25px;
+}
+.node-obstacle {
+  background-image: url(../../images/floor6.jpg);
+  background-size: 30px;
 }
 
 .unseen {

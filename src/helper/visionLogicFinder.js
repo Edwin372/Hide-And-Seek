@@ -1,4 +1,4 @@
-import {isSafe} from "../algorithms/backTracking"
+import isSafe from "./isSafe"
 
 export const visionLogicFinder = (grid, maxRow, maxCol) => {
     // console.log(grid[0],'tester')

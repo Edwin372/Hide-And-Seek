@@ -33,15 +33,15 @@ export default class PathfindingVisualizer extends Component {
       }
       var file = files[0];
       var fileReader = new FileReader();
-  
+      
       fileReader.onload = (progressEvent) => {
         var stringData = fileReader.result;
         let str = stringData.split("\n");
-        console.log(str)
-        console.log(str[0])
         inputMN = str[0].split(" ").map((x) => parseInt(x));
         for (let i = 0; i < inputMN[0]; i++) {
-          if (str[i+ 1]) {
+
+          if (str[i+ 1] && str[0]) {
+            console.log(str[i+ 1][0])
             let inputLine = str[i + 1].split(" ").map((x) => parseInt(x));
             inputData.push(inputLine);
           }else {
@@ -254,6 +254,7 @@ export default class PathfindingVisualizer extends Component {
       isFinish: false,
       isVisited: false,
       isWall: false,
+      stuckDirection: [],
       previousNode: null,
       point: 0,
       visitTime: 0,
@@ -267,13 +268,13 @@ export default class PathfindingVisualizer extends Component {
           isWall: true,
           point: 0,
         };
-      case 2:
+      case 3:
         this.setState({ startNodeRow: row, startNodeCol: col });
         return {
           ...node,
           isStart: true,
         };
-      case 3:
+      case 2:
         const newNode = {
           ...node,
           isFinish: true,
@@ -288,6 +289,12 @@ export default class PathfindingVisualizer extends Component {
           };
         });
         return newNode;
+      case 4: 
+        return {
+          ...node,
+          isObstacle: true,
+          point: 1,
+        }
       default:
         return node;
     }
@@ -312,21 +319,18 @@ export default class PathfindingVisualizer extends Component {
     const { grid, mouseIsPressed, gameStarted } = this.state;
     return (
       <>
-        <button onClick={() => {
-          if (this.state.mapChosen) {
-             this.visualizeBackTracking()
-          } else {
-            alert('please choose a map from your')
-          }
-         
-        }}>Game on!</button>
+        <button onClick={() => {this.visualizeBackTracking()}} disabled={this.state.mapChosen ? false: true}>Game on!</button>
         <input type="file" onChange={(e) => this.readFromTxtFile(e)}></input>
+        <div style={{
+          margin: 'auto',
+          color: 'red'
+        }}>YOU CAN TOUCH ANY NODE IN THE MAP TO CREATE WALL!</div>
         <div className="grid">
           {grid.map((row, rowIdx) => {
             return (
               <div key={rowIdx} className="row">
                 {row.map((node, nodeIdx) => {
-                  const { row, col, isFinish, isStart, isWall } = node;
+                  const { row, col, isFinish, isStart, isWall, isObstacle } = node;
                   return (
                     <Node
                       key={nodeIdx}
@@ -334,6 +338,7 @@ export default class PathfindingVisualizer extends Component {
                       isFinish={isFinish}
                       isStart={isStart}
                       isWall={isWall}
+                      isObstacle={isObstacle}
                       mouseIsPressed={mouseIsPressed}
                       gameStarted={gameStarted}
                       onMouseDown={(row, col) => this.handleMouseDown(row, col)}

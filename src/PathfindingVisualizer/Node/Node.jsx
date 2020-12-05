@@ -13,7 +13,8 @@ export default class Node extends Component {
       onMouseEnter,
       onMouseUp,
       row,
-      gameStarted
+      gameStarted,
+      isObstacle
     } = this.props;
     const extraClassName = isFinish
       ? 'node-finish'
@@ -21,7 +22,9 @@ export default class Node extends Component {
       ? 'node-start'
       : isWall
       ? 'node-wall'
-      : '';
+      : isObstacle
+      ? 'node-obstacle'
+      : 'node'
 
     return (
       <div
