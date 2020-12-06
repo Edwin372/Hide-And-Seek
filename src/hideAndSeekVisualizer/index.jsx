@@ -265,7 +265,6 @@ export default class PathfindingVisualizer extends Component {
     for (let row = 0; row < maxRow; row++) {
       let currentRow = [];
       for (let col = 0; col < maxCol; col++) {
-        console.log(inputData)
         currentRow.push(this.createNode(col, row, inputData[row][col]));
       }
       grid.push(currentRow);
@@ -289,7 +288,6 @@ export default class PathfindingVisualizer extends Component {
       hiderVisitTime: 0,
       hiderPoint: 0,
     };
-    console.log(nodeType)
     switch (nodeType) {
       case 0:
         return node;
