@@ -20,12 +20,45 @@ export default class PathfindingVisualizer extends Component {
       maxCol: 0,
     };
   }
+  componentDidMount() {
+    let inputData = [
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,2,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,0],
+      [0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0],
+      [0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,2,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    ];
+    this.setState({ inputData }, () => {
+      this.setState({ maxRow: 20, maxCol: 20 }, () => {
+        const grid = this.getInitialGrid(inputData);
+        this.setState({ grid, mapChosen: true });
+      });
+    });
+   
+  }
   readFromTxtFile = (evt) => {
     try {
       var inputData = [];
       var inputMN = [];
       evt.stopPropagation();
       evt.preventDefault();
+      this.setState({finishNodes: [], grid: []})
       var files = evt.target.files;
 
       if (files.length !== 1) {
@@ -232,6 +265,7 @@ export default class PathfindingVisualizer extends Component {
     for (let row = 0; row < maxRow; row++) {
       let currentRow = [];
       for (let col = 0; col < maxCol; col++) {
+        console.log(inputData)
         currentRow.push(this.createNode(col, row, inputData[row][col]));
       }
       grid.push(currentRow);
@@ -255,6 +289,7 @@ export default class PathfindingVisualizer extends Component {
       hiderVisitTime: 0,
       hiderPoint: 0,
     };
+    console.log(nodeType)
     switch (nodeType) {
       case 0:
         return node;
@@ -265,6 +300,7 @@ export default class PathfindingVisualizer extends Component {
           point: 0,
         };
       case 3:
+
         this.setState({ startNodeRow: row, startNodeCol: col });
         return {
           ...node,
@@ -324,7 +360,7 @@ export default class PathfindingVisualizer extends Component {
           onClick={() => {
             this.visualizeBackTracking();
           }}
-          disabled={this.state.mapChosen ? false : true}
+          disabled={this.state.mapChosen || this.state.gameStarted ? false : true}
         >
           Game on!
         </button>
@@ -333,9 +369,18 @@ export default class PathfindingVisualizer extends Component {
           style={{
             margin: "auto",
             color: "red",
+            width: "700px",
+            textAlign: "left"
           }}
         >
-          YOU CAN TOUCH ANY NODE IN THE MAP TO CREATE WALL!
+          YOU CAN TOUCH ANY NODE IN THE MAP TO CREATE WALL! <br/>
+          In case you choose a map, please choose a txt file with correct format:<br/>
+          - The first line contains two integers N x M, which is the size of map.<br/>
+          - N next lines represent the N x M map matrix. Each line contains M integers.<br/>
+          The number at [i, j] (row i, column j) determines whether wall, hiders or seeker
+          is set. If there is wall at this position, we will have value 1. If there is hider, we
+          will have value 2. If there is seeker, we will have 3. Otherwise (empty path), we
+          will have 0.<br/>
         </div>
         <div className="grid">
           {grid.map((row, rowIdx) => {

@@ -239,6 +239,7 @@ const findTarget = (
   while (remainingHiders.length > 0) {
     if (stepCount > 10000) {
       alert("your target can not be found");
+      window.location.reload()
       return [];
     }
     // console.log('gothere')
