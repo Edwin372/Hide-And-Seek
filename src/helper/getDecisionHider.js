@@ -24,15 +24,13 @@ const getHeuristicPointHider = (
     }
   }
 };
-const getFinderInVision = (finder, vision) => {
+const getFinderInVision = (finder, _grid, vision) => {
   // console.log(vision,'vision')
   let output = { seen: false };
   vision.forEach((item) => {
     if (finder.row === item[0] && finder.col === item[1]) {
       // console.log('got here')
       // console.log(grid[item[0]][item[1]])
-      console.log(item[0], item[1])
-
       output = {
         seen: true,
         location: [item[0], item[1]],
@@ -54,7 +52,7 @@ export const getDecisionHider = (finder, currentNode, grid, maxRow, maxCol) => {
     "South",
     "EastSouth",
   ];
-  let finderLocation = getFinderInVision(finder, currentNode.visionHider);
+  let finderLocation = getFinderInVision(finder, grid, currentNode.visionHider);
   // console.log(finderLocation,'FinderLocation')
   direction.forEach((item) => {
     switch (item) {
@@ -388,9 +386,9 @@ export const getDecisionHider = (finder, currentNode, grid, maxRow, maxCol) => {
   // arrange decision queue  in order of priority vision heuristic point, euclid distance, number of visited times respectively
   const sortedDecision = decisionQueue.sort((item1, item2) =>
     item1[3] > item2[3] ? 1 : item1[3] < item2[3] ? -1 : 0
-  )
-  .sort((item1, item2) => (item1[2] < item2[2]) ? 1 : ( item1[2] > item2[2]? -1 : 0))
-  // console.log(sortedDecision);
+  );
+  // .sort((item1, item2) => (item1[2] < item2[2]) ? 1 : ( item1[2] > item2[2]? -1 : 0))
+  console.log(sortedDecision);
   const finalDecision = sortedDecision[decisionQueue.length - 1];
   // choose the best option after sorted
   return finalDecision;
