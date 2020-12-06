@@ -387,10 +387,10 @@ const getDecision = (currentNode, grid, maxRow, maxCol, announcedPos) => {
   // arrange decision queue  in order of priority vision heuristic point, euclid distance, number of visited times respectively
   const finalDecision = decisionQueue
     .sort((item1, item2) =>
-      item1[4] < item2[4] ? 1 : item1[4] > item2[4] ? -1 : 0
+      item1[3] < item2[3] ? 1 : item1[3] > item2[3] ? -1 : 0
     )
     .sort((item1, item2) =>
-      item1[3] < item2[3] ? 1 : item1[3] > item2[3] ? -1 : 0
+      item1[4] < item2[4] ? 1 : item1[4] > item2[4] ? -1 : 0
     )
     .sort((item1, item2) =>
       item1[2] > item2[2] ? 1 : item1[2] < item2[2] ? -1 : 0
