@@ -8,6 +8,7 @@ export default class PathfindingVisualizer extends Component {
   constructor() {
     super();
     this.state = {
+      score: 0,
       gameStarted: false,
       mapChosen: false,
       grid: [],
@@ -22,27 +23,27 @@ export default class PathfindingVisualizer extends Component {
   }
   componentDidMount() {
     let inputData = [
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,2,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,0],
-      [0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0],
-      [0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,2,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 2, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0],
+      [0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     ];
     this.setState({ inputData }, () => {
       this.setState({ maxRow: 20, maxCol: 20 }, () => {
@@ -50,7 +51,6 @@ export default class PathfindingVisualizer extends Component {
         this.setState({ grid, mapChosen: true });
       });
     });
-   
   }
   readFromTxtFile = (evt) => {
     try {
@@ -58,7 +58,7 @@ export default class PathfindingVisualizer extends Component {
       var inputMN = [];
       evt.stopPropagation();
       evt.preventDefault();
-      this.setState({finishNodes: [], grid: []})
+      this.setState({ finishNodes: [], grid: [] });
       var files = evt.target.files;
 
       if (files.length !== 1) {
@@ -115,7 +115,6 @@ export default class PathfindingVisualizer extends Component {
       } else {
         const node = finderTour[i];
         const prevNode = finderTour[i - 1];
-
         setTimeout(() => {
           let currentNodeElement = document.getElementById(
             `node-${node.row}-${node.col}`
@@ -123,7 +122,11 @@ export default class PathfindingVisualizer extends Component {
           let prevNodeElement = document.getElementById(
             `node-${prevNode.row}-${prevNode.col}`
           );
-
+          this.setState((state) => {
+            return {
+              score: state.score - 1,
+            };
+          });
           this.animateVision(node.vision, prevNode.vision);
           if (prevNodeElement.className !== "node node-dead-body") {
             prevNodeElement.className = "node";
@@ -131,6 +134,10 @@ export default class PathfindingVisualizer extends Component {
           if (currentNodeElement.className !== "node node-dead-body") {
             currentNodeElement.className = "node node-start";
             this.animateVision(node.vision, prevNode.vision);
+          }
+          if (i === finderTour.length - 1) {
+            alert("All hider have been found !!!");
+            window.location.reload();
           }
         }, DELAY_TIME * i);
       }
@@ -180,6 +187,11 @@ export default class PathfindingVisualizer extends Component {
           }
           if (i === hidingTour.length - 1) {
             currentNodeElement.className = "node node-dead-body";
+            this.setState((state) => {
+              return {
+                score: state.score + 20,
+              };
+            });
           } else {
             if (currentNodeElement.className !== "node node-dead-body") {
               currentNodeElement.className = "node node-finish";
@@ -298,7 +310,6 @@ export default class PathfindingVisualizer extends Component {
           point: 0,
         };
       case 3:
-
         this.setState({ startNodeRow: row, startNodeCol: col });
         return {
           ...node,
@@ -358,27 +369,61 @@ export default class PathfindingVisualizer extends Component {
           onClick={() => {
             this.visualizeAlgorithms();
           }}
-          disabled={this.state.mapChosen || this.state.gameStarted ? false : true}
+          disabled={
+            this.state.mapChosen || this.state.gameStarted ? false : true
+          }
+          style={{
+            color: "yellow",
+            fontFamily: "Nerko One",
+            fontSize: "20px",
+          }}
         >
-          Game on!
+          GAME ON!
         </button>
-        <input type="file" onChange={(e) => this.readFromTxtFile(e)}></input>
+        <input
+          type="file"
+          onChange={(e) => this.readFromTxtFile(e)}
+          style={{
+            color: "black",
+            fontFamily: "Nerko One",
+            fontSize: "15px",
+          }}
+        ></input>
         <div
           style={{
             margin: "auto",
             color: "red",
             width: "700px",
-            textAlign: "left"
+            textAlign: "left",
+            fontFamily: "Nerko One",
           }}
         >
-          YOU CAN TOUCH ANY NODE IN THE MAP TO CREATE WALL! <br/>
-          In case you choose a map, please choose a txt file with correct format:<br/>
-          - The first line contains two integers N x M, which is the size of map.<br/>
-          - N next lines represent the N x M map matrix. Each line contains M integers.<br/>
-          The number at [i, j] (row i, column j) determines whether wall, hiders or seeker
-          is set. If there is wall at this position, we will have value 1. If there is hider, we
-          will have value 2. If there is seeker, we will have 3. Otherwise (empty path), we
-          will have 0.<br/>
+          YOU CAN TOUCH ANY NODE IN THE MAP TO CREATE WALL! <br />
+          In case you choose a map, please choose a txt file with correct
+          format:
+          <br />
+          - The first line contains two integers N x M, which is the size of
+          map.
+          <br />
+          - N next lines represent the N x M map matrix. Each line contains M
+          integers.
+          <br />
+          The number at [i, j] (row i, column j) determines whether wall, hiders
+          or seeker is set. If there is wall at this position, we will have
+          value 1. If there is hider, we will have value 2. If there is seeker,
+          we will have 3. Otherwise (empty path), we will have 0.
+          <br />
+        </div>
+        <div
+          style={{
+            margin: "auto",
+            color: "blue",
+            textAlign: "center",
+            fontFamily: "Nerko One",
+            fontSize: "25px",
+          }}
+        >
+          Score {this.state.score}
         </div>
         <div className="grid">
           {grid.map((row, rowIdx) => {
