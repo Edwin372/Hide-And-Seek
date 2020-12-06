@@ -3,7 +3,7 @@ import Node from "./Node/Node";
 import { backTrack } from "../algorithms/backTracking";
 import "./PathfindingVisualizer.css";
 // import dropHandler from "../helper/inputfromText";
-const DELAY_TIME = 125
+const DELAY_TIME = 125;
 export default class PathfindingVisualizer extends Component {
   constructor() {
     super();
@@ -27,41 +27,38 @@ export default class PathfindingVisualizer extends Component {
       evt.stopPropagation();
       evt.preventDefault();
       var files = evt.target.files;
-  
+
       if (files.length !== 1) {
         return;
       }
       var file = files[0];
       var fileReader = new FileReader();
-      
+
       fileReader.onload = (progressEvent) => {
         var stringData = fileReader.result;
         let str = stringData.split("\n");
         inputMN = str[0].split(" ").map((x) => parseInt(x));
         for (let i = 0; i < inputMN[0]; i++) {
-
-          if (str[i+ 1] && str[0]) {
-            console.log(str[i+ 1][0])
+          if (str[i + 1] && str[0]) {
+            // console.log(str[i + 1][0]);
             let inputLine = str[i + 1].split(" ").map((x) => parseInt(x));
             inputData.push(inputLine);
-          }else {
-            alert('Your map is not legit!')
-            return 
+          } else {
+            alert("Your map is not legit!");
+            return;
           }
-       
         }
         this.setState({ inputData }, () => {
           this.setState({ maxRow: inputMN[0], maxCol: inputMN[1] }, () => {
             const grid = this.getInitialGrid(inputData);
-            this.setState({ grid , mapChosen: true});
+            this.setState({ grid, mapChosen: true });
           });
         });
       };
       fileReader.readAsText(file, "UTF-8"); // fileReader.result -> String.
     } catch (err) {
-      alert('your map is not legit!')
+      alert("your map is not legit!");
     }
-    
   };
 
   handleMouseDown(row, col) {
@@ -95,10 +92,10 @@ export default class PathfindingVisualizer extends Component {
           );
 
           this.animateVision(node.vision, prevNode.vision);
-          if (prevNodeElement.className !== 'node node-dead-body') {
+          if (prevNodeElement.className !== "node node-dead-body") {
             prevNodeElement.className = "node";
           }
-          if (currentNodeElement.className !== 'node node-dead-body') {
+          if (currentNodeElement.className !== "node node-dead-body") {
             currentNodeElement.className = "node node-start";
             this.animateVision(node.vision, prevNode.vision);
           }
@@ -122,8 +119,8 @@ export default class PathfindingVisualizer extends Component {
             `node-${prevNode.row}-${prevNode.col}`
           );
 
-            prevNodeElement.className = "node";
-            currentNodeElement.className = "node node-visited";
+          prevNodeElement.className = "node";
+          currentNodeElement.className = "node node-visited";
         }, DELAY_TIME * 5 * i);
       }
     }
@@ -136,7 +133,7 @@ export default class PathfindingVisualizer extends Component {
         const node = hidingTour[i];
         const prevNode = hidingTour[i - 1];
         // console.log(node.row, node.col)
-        
+
         setTimeout(() => {
           let currentNodeElement = document.getElementById(
             `node-${node.row}-${node.col}`
@@ -144,20 +141,18 @@ export default class PathfindingVisualizer extends Component {
           let prevNodeElement = document.getElementById(
             `node-${prevNode.row}-${prevNode.col}`
           );
-         
-          if (prevNodeElement.className !== 'node node-dead-body') {
+
+          if (prevNodeElement.className !== "node node-dead-body") {
             prevNodeElement.className = "node";
           }
           if (i === hidingTour.length - 1) {
             currentNodeElement.className = "node node-dead-body";
           } else {
-            if (currentNodeElement.className !== 'node node-dead-body') {
+            if (currentNodeElement.className !== "node node-dead-body") {
               currentNodeElement.className = "node node-finish";
               this.animateVisionHider(node.visionHider, prevNode.visionHider);
             }
           }
-          
-         
         }, DELAY_TIME * i);
       }
     }
@@ -180,24 +175,25 @@ export default class PathfindingVisualizer extends Component {
   animateVisionHider(curVision, prevVision) {
     prevVision.forEach((item) => {
       if (
-        document.getElementById(`node-${item[0]}-${item[1]}`).childNodes[0].className !== 'seen'
+        document.getElementById(`node-${item[0]}-${item[1]}`).childNodes[0]
+          .className !== "seen"
         // document.getElementById(`node-${item[0]}-${item[1]}`).childNodes[0].className !== 'seenHider'
       ) {
         document.getElementById(
           `node-${item[0]}-${item[1]}`
         ).childNodes[0].className = "unseen";
       }
-     
     });
-    
+
     curVision.forEach((item) => {
       if (
-        document.getElementById(`node-${item[0]}-${item[1]}`).childNodes[0].className === 'unseen'
+        document.getElementById(`node-${item[0]}-${item[1]}`).childNodes[0]
+          .className === "unseen"
         // document.getElementById(`node-${item[0]}-${item[1]}`).childNodes[0].className !== 'seenHider'
       ) {
-      document.getElementById(
-        `node-${item[0]}-${item[1]}`
-      ).childNodes[0].className = "seenHider";
+        document.getElementById(
+          `node-${item[0]}-${item[1]}`
+        ).childNodes[0].className = "seenHider";
       }
     });
   }
@@ -214,7 +210,7 @@ export default class PathfindingVisualizer extends Component {
     // console.log(finishNodes)
     this.setState({ gameStarted: true });
     const startNode = grid[startNodeRow][startNodeCol];
-    const { backTrackTour, hidingTours,  noiseTours} = backTrack(
+    const { backTrackTour, hidingTours, noiseTours } = backTrack(
       grid,
       startNode,
       maxRow,
@@ -224,13 +220,10 @@ export default class PathfindingVisualizer extends Component {
     this.animateBackTrackTour(backTrackTour);
     hidingTours.forEach((hidingTour) => {
       this.animateHidingTour(hidingTour);
-     
     });
     noiseTours.forEach((noiseTour) => {
       this.animateNoiseTour(noiseTour);
-     
     });
-    
   }
 
   getInitialGrid = () => {
@@ -254,6 +247,7 @@ export default class PathfindingVisualizer extends Component {
       isFinish: false,
       isVisited: false,
       isWall: false,
+      isFinder: false,
       stuckDirection: [],
       previousNode: null,
       point: 0,
@@ -273,6 +267,7 @@ export default class PathfindingVisualizer extends Component {
         return {
           ...node,
           isStart: true,
+          isFinder: true,
         };
       case 2:
         const newNode = {
@@ -284,17 +279,21 @@ export default class PathfindingVisualizer extends Component {
           return {
             finishNodes: [
               ...state.finishNodes,
-              { row: newNode.row, col: newNode.col, index: state.finishNodes.length },
+              {
+                row: newNode.row,
+                col: newNode.col,
+                index: state.finishNodes.length,
+              },
             ],
           };
         });
         return newNode;
-      case 4: 
+      case 4:
         return {
           ...node,
           isObstacle: true,
           point: 1,
-        }
+        };
       default:
         return node;
     }
@@ -319,18 +318,36 @@ export default class PathfindingVisualizer extends Component {
     const { grid, mouseIsPressed, gameStarted } = this.state;
     return (
       <>
-        <button onClick={() => {this.visualizeBackTracking()}} disabled={this.state.mapChosen ? false: true}>Game on!</button>
+        <button
+          onClick={() => {
+            this.visualizeBackTracking();
+          }}
+          disabled={this.state.mapChosen ? false : true}
+        >
+          Game on!
+        </button>
         <input type="file" onChange={(e) => this.readFromTxtFile(e)}></input>
-        <div style={{
-          margin: 'auto',
-          color: 'red'
-        }}>YOU CAN TOUCH ANY NODE IN THE MAP TO CREATE WALL!</div>
+        <div
+          style={{
+            margin: "auto",
+            color: "red",
+          }}
+        >
+          YOU CAN TOUCH ANY NODE IN THE MAP TO CREATE WALL!
+        </div>
         <div className="grid">
           {grid.map((row, rowIdx) => {
             return (
               <div key={rowIdx} className="row">
                 {row.map((node, nodeIdx) => {
-                  const { row, col, isFinish, isStart, isWall, isObstacle } = node;
+                  const {
+                    row,
+                    col,
+                    isFinish,
+                    isStart,
+                    isWall,
+                    isObstacle,
+                  } = node;
                   return (
                     <Node
                       key={nodeIdx}
