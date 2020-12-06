@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import Node from "./Node/Node";
-import { backTrack } from "../algorithms/backTracking";
-import "./PathfindingVisualizer.css";
+import Node from "./Node";
+import { algorithms } from "../algorithms";
+import "./hideAndSeekVisualizer.css";
 // import dropHandler from "../helper/inputfromText";
 const DELAY_TIME = 125;
 export default class PathfindingVisualizer extends Component {
@@ -109,12 +109,12 @@ export default class PathfindingVisualizer extends Component {
     this.setState({ mouseIsPressed: false });
   }
 
-  animateBackTrackTour(backTrackTour) {
-    for (let i = 1; i <= backTrackTour.length; i++) {
-      if (i === backTrackTour.length) {
+  animateAlgorithms(finderTour) {
+    for (let i = 1; i <= finderTour.length; i++) {
+      if (i === finderTour.length) {
       } else {
-        const node = backTrackTour[i];
-        const prevNode = backTrackTour[i - 1];
+        const node = finderTour[i];
+        const prevNode = finderTour[i - 1];
 
         setTimeout(() => {
           let currentNodeElement = document.getElementById(
@@ -231,7 +231,7 @@ export default class PathfindingVisualizer extends Component {
     });
   }
 
-  visualizeBackTracking() {
+  visualizeAlgorithms() {
     const {
       grid,
       startNodeRow,
@@ -243,14 +243,14 @@ export default class PathfindingVisualizer extends Component {
     // console.log(finishNodes)
     this.setState({ gameStarted: true });
     const startNode = grid[startNodeRow][startNodeCol];
-    const { backTrackTour, hidingTours, noiseTours } = backTrack(
+    const { finderTour, hidingTours, noiseTours } = algorithms(
       grid,
       startNode,
       maxRow,
       maxCol,
       finishNodes
     );
-    this.animateBackTrackTour(backTrackTour);
+    this.animateAlgorithms(finderTour);
     hidingTours.forEach((hidingTour) => {
       this.animateHidingTour(hidingTour);
     });
@@ -358,7 +358,7 @@ export default class PathfindingVisualizer extends Component {
       <>
         <button
           onClick={() => {
-            this.visualizeBackTracking();
+            this.visualizeAlgorithms();
           }}
           disabled={this.state.mapChosen || this.state.gameStarted ? false : true}
         >

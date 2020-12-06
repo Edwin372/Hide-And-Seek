@@ -40,7 +40,7 @@ const getFinderInVision = (finder, _grid, vision) => {
   return output;
 };
 
-export const getDecisionHider = (finder, currentNode, grid, maxRow, maxCol) => {
+const getDecisionHider = (finder, currentNode, grid, maxRow, maxCol) => {
   let decisionQueue = [];
   let direction = [
     "East",
@@ -442,3 +442,5 @@ export const getDecisionHider = (finder, currentNode, grid, maxRow, maxCol) => {
   // choose the best option after sorted
   return finalDecision;
 };
+
+export default getDecisionHider

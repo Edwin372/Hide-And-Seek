@@ -1,4 +1,4 @@
-import {stepX, stepY} from '../algorithms/backTracking'
+import {stepX, stepY} from '../algorithms'
 import isSafe from './isSafe'
 const generateHeuristicMap = (grid, maxRow, maxCol) => {
     grid.forEach((row) => {
