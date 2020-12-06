@@ -252,6 +252,8 @@ export default class PathfindingVisualizer extends Component {
       previousNode: null,
       point: 0,
       visitTime: 0,
+      hiderVisitTime: 0,
+      hiderPoint: 0,
     };
     switch (nodeType) {
       case 0:

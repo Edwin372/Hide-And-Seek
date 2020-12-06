@@ -17,7 +17,7 @@ const getHeuristicPointHider = (
     if (currentNode) {
       let seenNodes = getSeenNode(currentNode, grid, signArr, maxRow, maxCol);
       let heuristicPoint = seenNodes.reduce(
-        (sum, seenNode) => sum + seenNode.point,
+        (sum, seenNode) => sum + seenNode.hiderPoint,
         0
       );
       return heuristicPoint;
@@ -83,17 +83,26 @@ export const getDecisionHider = (finder, currentNode, grid, maxRow, maxCol) => {
             maxRow,
             maxCol
           );
-          if (finderLocation.seen) {
-            var eastEuclidDistance = calculateMinEuclidDistanceForHider(
+          var eastEuclidDistance = 0;
+          if (
+            finderLocation.seen &&
+            !grid[currentNode.row][currentNode.col + 1].isWall
+          ) {
+            eastEuclidDistance = calculateMinEuclidDistanceForHider(
               grid[currentNode.row][currentNode.col + 1],
               grid[finder.row][finder.col]
             );
           }
           // console.log("got")
-          else var eastEuclidDistance = 0;
           // in case heuristic point of next move is null (this happen when east step meet wall or edge of the map)
           if (eastHeuristicPoint !== null) {
-            decisionQueue.push([0, 1, eastHeuristicPoint, eastEuclidDistance]);
+            decisionQueue.push([
+              0,
+              1,
+              eastHeuristicPoint,
+              eastEuclidDistance,
+              grid[currentNode.row][currentNode.col + 1].hiderVisitTime,
+            ]);
             break;
           }
         }
@@ -122,18 +131,22 @@ export const getDecisionHider = (finder, currentNode, grid, maxRow, maxCol) => {
             maxRow,
             maxCol
           );
-          if (finderLocation.seen)
-            var eastNorthEuclidDistance = calculateMinEuclidDistanceForHider(
+          var eastNorthEuclidDistance = 0;
+          if (
+            finderLocation.seen &&
+            !grid[currentNode.row - 1][currentNode.col + 1].isWall
+          )
+            eastNorthEuclidDistance = calculateMinEuclidDistanceForHider(
               grid[currentNode.row - 1][currentNode.col + 1],
               grid[finder.row][finder.col]
             );
-          else var eastNorthEuclidDistance = 0;
           if (eastNorthHeuristicPoint !== null) {
             decisionQueue.push([
               -1,
               1,
               eastNorthHeuristicPoint,
               eastNorthEuclidDistance,
+              grid[currentNode.row - 1][currentNode.col + 1].hiderVisitTime,
             ]);
             break;
           }
@@ -163,18 +176,22 @@ export const getDecisionHider = (finder, currentNode, grid, maxRow, maxCol) => {
             maxRow,
             maxCol
           );
-          if (finderLocation.vision)
-            var northEuclidDistance = calculateMinEuclidDistanceForHider(
+          var northEuclidDistance = 0;
+          if (
+            finderLocation.vision &&
+            !grid[currentNode.row - 1][currentNode.col].isWall
+          )
+            northEuclidDistance = calculateMinEuclidDistanceForHider(
               grid[currentNode.row - 1][currentNode.col],
               grid[finder.row][finder.col]
             );
-          else var northEuclidDistance = 0;
           if (northHeuristicPoint !== null) {
             decisionQueue.push([
               -1,
               0,
               northHeuristicPoint,
               northEuclidDistance,
+              grid[currentNode.row - 1][currentNode.col].hiderVisitTime,
             ]);
             break;
           }
@@ -204,18 +221,22 @@ export const getDecisionHider = (finder, currentNode, grid, maxRow, maxCol) => {
             maxRow,
             maxCol
           );
-          if (finderLocation.vision)
-            var westNorthEuclidDistance = calculateMinEuclidDistanceForHider(
+          var westNorthEuclidDistance = 0;
+          if (
+            finderLocation.vision &&
+            !grid[currentNode.row - 1][currentNode.col - 1].isWall
+          )
+            westNorthEuclidDistance = calculateMinEuclidDistanceForHider(
               grid[currentNode.row - 1][currentNode.col - 1],
               grid[finder.row][finder.col]
             );
-          else var westNorthEuclidDistance = 0;
           if (westNorthHeuristicPoint !== null) {
             decisionQueue.push([
               -1,
               -1,
               westNorthHeuristicPoint,
               westNorthEuclidDistance,
+              grid[currentNode.row - 1][currentNode.col - 1].hiderVisitTime,
             ]);
             break;
           }
@@ -244,14 +265,23 @@ export const getDecisionHider = (finder, currentNode, grid, maxRow, maxCol) => {
             maxRow,
             maxCol
           );
-          if (finderLocation.vision)
-            var westEuclidDistance = calculateMinEuclidDistanceForHider(
+          var westEuclidDistance = 0;
+          if (
+            finderLocation.vision &&
+            !grid[currentNode.row][currentNode.col - 1].isWall
+          )
+            westEuclidDistance = calculateMinEuclidDistanceForHider(
               grid[currentNode.row][currentNode.col - 1],
               grid[finder.row][finder.col]
             );
-          else var westEuclidDistance = 0;
           if (westHeuristicPoint !== null) {
-            decisionQueue.push([0, -1, westHeuristicPoint, westEuclidDistance]);
+            decisionQueue.push([
+              0,
+              -1,
+              westHeuristicPoint,
+              westEuclidDistance,
+              grid[currentNode.row][currentNode.col - 1].hiderVisitTime,
+            ]);
             break;
           }
         }
@@ -280,18 +310,22 @@ export const getDecisionHider = (finder, currentNode, grid, maxRow, maxCol) => {
             maxRow,
             maxCol
           );
-          if (finderLocation.vision)
-            var westSouthEuclidDistance = calculateMinEuclidDistanceForHider(
+          var westSouthEuclidDistance = 0;
+          if (
+            finderLocation.vision &&
+            !grid[currentNode.row + 1][currentNode.col - 1].isWall
+          )
+            westSouthEuclidDistance = calculateMinEuclidDistanceForHider(
               grid[currentNode.row + 1][currentNode.col - 1],
               grid[finder.row][finder.col]
             );
-          else var westSouthEuclidDistance = 0;
           if (westSouthHeuristicPoint !== null) {
             decisionQueue.push([
               1,
               -1,
               westSouthHeuristicPoint,
               westSouthEuclidDistance,
+              grid[currentNode.row + 1][currentNode.col - 1].hiderVisitTime,
             ]);
             break;
           }
@@ -321,18 +355,22 @@ export const getDecisionHider = (finder, currentNode, grid, maxRow, maxCol) => {
             maxRow,
             maxCol
           );
-          if (finderLocation.vision)
-            var southEuclidDistance = calculateMinEuclidDistanceForHider(
+          var southEuclidDistance = 0;
+          if (
+            finderLocation.vision &&
+            !grid[currentNode.row + 1][currentNode.col].isWall
+          )
+            southEuclidDistance = calculateMinEuclidDistanceForHider(
               grid[currentNode.row + 1][currentNode.col],
               grid[finder.row][finder.col]
             );
-          else var southEuclidDistance = 0;
           if (southHeuristicPoint !== null) {
             decisionQueue.push([
               1,
               0,
               southHeuristicPoint,
               southEuclidDistance,
+              grid[currentNode.row + 1][currentNode.col].hiderVisitTime,
             ]);
             break;
           }
@@ -362,18 +400,22 @@ export const getDecisionHider = (finder, currentNode, grid, maxRow, maxCol) => {
             maxRow,
             maxCol
           );
-          if (finderLocation.vision)
-            var eastSouthEuclidDistance = calculateMinEuclidDistanceForHider(
+          var eastSouthEuclidDistance = 0;
+          if (
+            finderLocation.vision &&
+            !grid[currentNode.row + 1][currentNode.col + 1].isWall
+          )
+            eastSouthEuclidDistance = calculateMinEuclidDistanceForHider(
               grid[currentNode.row + 1][currentNode.col + 1],
               grid[finder.row][finder.col]
             );
-          else var eastSouthEuclidDistance = 0;
           if (eastSouthHeuristicPoint !== null) {
             decisionQueue.push([
               1,
               1,
               eastSouthHeuristicPoint,
               eastSouthEuclidDistance,
+              grid[currentNode.row + 1][currentNode.col + 1].hiderVisitTime,
             ]);
             break;
           }
@@ -384,11 +426,18 @@ export const getDecisionHider = (finder, currentNode, grid, maxRow, maxCol) => {
     }
   });
   // arrange decision queue  in order of priority vision heuristic point, euclid distance, number of visited times respectively
-  const sortedDecision = decisionQueue.sort((item1, item2) =>
-    item1[3] > item2[3] ? 1 : item1[3] < item2[3] ? -1 : 0
-  );
-  // .sort((item1, item2) => (item1[2] < item2[2]) ? 1 : ( item1[2] > item2[2]? -1 : 0))
-  console.log(sortedDecision);
+  const sortedDecision = decisionQueue
+    .sort((item1, item2) =>
+      item1[4] < item2[4] ? 1 : item1[4] > item2[4] ? -1 : 0
+    )
+    .sort((item1, item2) =>
+      item1[2] > item2[2] ? 1 : item1[2] < item2[2] ? -1 : 0
+    )
+    .sort((item1, item2) =>
+      item1[3] > item2[3] ? 1 : item1[3] < item2[3] ? -1 : 0
+    );
+  //
+  // console.log(sortedDecision);
   const finalDecision = sortedDecision[decisionQueue.length - 1];
   // choose the best option after sorted
   return finalDecision;
