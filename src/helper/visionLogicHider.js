@@ -2,7 +2,7 @@ import isSafe from "./isSafe"
 
 export const visionLogicHider = (grid, maxRow, maxCol) => {
     // console.log(grid[0],'tester')
-    console.log(maxRow,' ',maxCol)
+    // console.log(maxRow,' ',maxCol)
     grid.forEach((row) => {
         row.forEach(currentNode => {
             // console.log(!currentNode.isWall,currentNode)
