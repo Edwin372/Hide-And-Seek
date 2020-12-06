@@ -80,31 +80,38 @@ const hide = (
       maxRow,
       maxCol
     );
-    if (
-      isSafe(
-        hider.row + finalDecision[0],
-        hider.col + finalDecision[1],
-        maxRow,
-        maxCol
-      ) &&
-      !grid[hider.row + finalDecision[0]][hider.col + finalDecision[1]]
-        .isWall &&
-      !grid[hider.row + finalDecision[0]][hider.col + finalDecision[1]].isFinish
-    ) {
-      // set old pos to path
-      grid[hider.row][hider.col].isFinish = false;
-      grid[hider.row][hider.col].point = 0;
-      //set new pos to finish
-      hider.row = hider.row + finalDecision[0]; // set new row pos
-      hider.col = hider.col + finalDecision[1]; // set new col pos
-      grid[hider.row][hider.col].point = 1000000; // set new point to 100000 for finder
-      grid[hider.row][hider.col].isFinish = true; // set new pos to hider pos
-      grid[hider.row][hider.col].hiderVisitTime += 1; // for visit time
-      // Push to hiding tour
-      hidingTours[hider.index].push(grid[hider.row][hider.col]);
+    if (finalDecision) {
+      if (
+        isSafe(
+          hider.row + finalDecision[0],
+          hider.col + finalDecision[1],
+          maxRow,
+          maxCol
+        ) &&
+        !grid[hider.row + finalDecision[0]][hider.col + finalDecision[1]]
+          .isWall &&
+        !grid[hider.row + finalDecision[0]][hider.col + finalDecision[1]].isFinish
+      ) {
+        // set old pos to path
+        grid[hider.row][hider.col].isFinish = false;
+        grid[hider.row][hider.col].point = 0;
+        //set new pos to finish
+        hider.row = hider.row + finalDecision[0]; // set new row pos
+        hider.col = hider.col + finalDecision[1]; // set new col pos
+        grid[hider.row][hider.col].point = 1000000; // set new point to 100000 for finder
+        grid[hider.row][hider.col].isFinish = true; // set new pos to hider pos
+        grid[hider.row][hider.col].hiderVisitTime += 1; // for visit time
+        // Push to hiding tour
+        hidingTours[hider.index].push(grid[hider.row][hider.col]);
+      } else {
+        hidingTours[hider.index].push(grid[hider.row][hider.col]);
+      }
     } else {
-      hidingTours[hider.index].push(grid[hider.row][hider.col]);
+      // alert("One of your hider is imprisoned :V!")
+      // window.location.reload()
+      // return []
     }
+    
   });
 };
 
@@ -238,7 +245,7 @@ const findTarget = (
   let announcedPos = [];
   while (remainingHiders.length > 0) {
     if (stepCount > 10000) {
-      alert("your target can not be found");
+      alert("Can not find all hiders!");
       window.location.reload()
       return [];
     }
@@ -272,18 +279,28 @@ const findTarget = (
     );
     effectEachMove(curNode, grid, maxRow, maxCol);
     let decision = getDecision(curNode, grid, maxRow, maxCol, announcedPos);
-    let movedPosition = changeObstaclePosition(
-      curNode,
-      decision[0],
-      decision[1],
-      grid,
-      maxRow,
-      maxCol
-    );
+    // let movedPosition = changeObstaclePosition(
+    //   curNode,
+    //   decision[0],
+    //   decision[1],
+    //   grid,
+    //   maxRow,
+    //   maxCol
+    // );
     // console.log(movedPosition)
     backTrackTour.push(curNode);
     // curNode.isFinder = false
-    curNode = grid[curNode.row + decision[0]][curNode.col + decision[1]];
+    if (decision) {
+      curNode = grid[curNode.row + decision[0]][curNode.col + decision[1]];
+    }
+    else {
+      alert("Your seeker is imprisoned :V!")
+      window.location.reload()
+
+      return []
+      
+
+    }
     // curNode.isFinder = true
   }
   return backTrackTour;
