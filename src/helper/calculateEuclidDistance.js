@@ -12,6 +12,7 @@ const  calculateMinEuclidDistance = (curNode, hidersAnnouncedPos) => {
 
 export const  calculateMinEuclidDistanceForHider = (curNode, finderLocation) => {
     let distance = Math.pow(finderLocation.row - curNode.row, 2) + Math.pow(finderLocation.col - curNode.col, 2)
+    // console.log(distance)
     console.log(distance)
     return distance
 }

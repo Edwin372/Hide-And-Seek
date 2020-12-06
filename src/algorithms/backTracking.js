@@ -3,6 +3,7 @@ import { visionLogicHider } from "../helper/visionLogicHider"
 import getDecision from '../helper/getDecision'
 import isSafe from '../helper/isSafe'
 import generateHeuristicMap from '../helper/generateHeuristicMap'
+import { getDecisionHider } from "../helper/getDecisionHider"
 // import moveObstacle from '../helper/moveObstacle'
 
 
@@ -15,7 +16,7 @@ export function backTrack(grid, startNode, maxRow, maxCol, remainingHiders) {
     generateHeuristicMap(grid, maxRow, maxCol)
     visionLogicFinder(grid,maxRow,maxCol)
     visionLogicHider(grid,maxRow,maxCol)
-    console.log(grid)
+    // console.log(grid)
     if (findTarget(grid, startNode, backTrackTour, hidingTours, noiseTours, 0, remainingHiders, maxRow, maxCol)) {
       console.log(backTrackTour)
       console.log(hidingTours)
@@ -31,7 +32,7 @@ export function backTrack(grid, startNode, maxRow, maxCol, remainingHiders) {
 
 const effectEachMove = (currentNode,grid, maxRow, maxCol)  => {
     currentNode.isVisited = true
-    currentNode.point -= 1          
+    currentNode.point -= 1
     currentNode.visitTime += 1
 }
 
@@ -47,7 +48,7 @@ const initTour = (hiders) => {
     return hidingTours
 }
 
-const hide = (hiders, grid, maxRow, maxCol, hidingTours, stepCount, announcedPosTour, announcedPos) => {
+const hide = (finder,hiders, grid, maxRow, maxCol, hidingTours, stepCount, announcedPosTour, announcedPos) => {
     if (stepCount % 5 === 0) {
         announcedPos.splice(0,announcedPos.length)
         hiders.forEach(hider => {
@@ -56,19 +57,20 @@ const hide = (hiders, grid, maxRow, maxCol, hidingTours, stepCount, announcedPos
     }
     
     hiders.forEach((hider) => {
-        let stepIndex = Math.floor(Math.random() * 8) 
+        let finalDecision = getDecisionHider(finder,grid[hider.row][hider.col],grid,maxRow,maxCol)
         if (
-            isSafe(hider.row + stepY[stepIndex], hider.col + stepX[stepIndex], maxRow, maxCol) &&
-            !grid[hider.row + stepY[stepIndex]][hider.col + stepX[stepIndex]].isWall &&
-            !grid[hider.row + stepY[stepIndex]][hider.col + stepX[stepIndex]].isFinish
+            isSafe(hider.row + finalDecision[1], hider.col + finalDecision[0], maxRow, maxCol) &&
+            !grid[hider.row + finalDecision[1]][hider.col + finalDecision[0]].isWall &&
+            !grid[hider.row + finalDecision[1]][hider.col + finalDecision[0]].isFinish
         ) {
             grid[hider.row][hider.col].isFinish = false
             grid[hider.row][hider.col].point = 0
-            grid[hider.row + stepY[stepIndex]][hider.col + stepX[stepIndex]].point = 1000000
-            grid[hider.row + stepY[stepIndex]][hider.col + stepX[stepIndex]].isFinish = true
-            hidingTours[hider.index].push(grid[hider.row + stepY[stepIndex]][hider.col + stepX[stepIndex]])
-            hider.row  = hider.row + stepY[stepIndex]
-            hider.col  = hider.col + stepX[stepIndex]
+            grid[hider.row + finalDecision[1]][hider.col + finalDecision[0]].point = 1000000
+            grid[hider.row + finalDecision[1]][hider.col + finalDecision[0]].isFinish = true
+            grid[hider.row + finalDecision[1]][hider.col + finalDecision[0]].visitTime += 1
+            hidingTours[hider.index].push(grid[hider.row + finalDecision[1]][hider.col + finalDecision[0]])
+            hider.row  = hider.row + finalDecision[1]
+            hider.col  = hider.col + finalDecision[0]
         }
         else {
             hidingTours[hider.index].push(grid[hider.row][hider.col])
@@ -155,7 +157,7 @@ const findTarget = (grid, currentNode, backTrackTour, hidingTours, announcedPosT
     let announcedPos = []
     while (remainingHiders.length > 0) {
        
-        if (stepCount  > 9000) {
+        if (stepCount  > 10000) {
             alert('your target can not be found')
             return []
         }
@@ -177,10 +179,12 @@ const findTarget = (grid, currentNode, backTrackTour, hidingTours, announcedPosT
         effectEachMove(curNode, grid, maxRow, maxCol)
         let decision = getDecision(curNode, grid, maxRow, maxCol, announcedPos)
         let movedPosition = changeObstaclePosition(curNode, decision[0], decision[1], grid, maxRow, maxCol)
-        console.log(movedPosition)
+        // console.log(movedPosition)
         backTrackTour.push(curNode)
+        // curNode.isFinder = false
         curNode = grid[curNode.row + decision[0]][curNode.col + decision[1]]
-        hide(remainingHiders, grid, maxRow, maxCol, hidingTours, stepCount, announcedPosTour, announcedPos)
+        // curNode.isFinder = true      
+        hide(curNode,remainingHiders, grid, maxRow, maxCol, hidingTours, stepCount, announcedPosTour, announcedPos)
     }
     return backTrackTour
 }
