@@ -1,6 +1,7 @@
 import getSeenNode from "./getSeenNode";
 import { calculateMinEuclidDistanceForHider } from "./calculateEuclidDistance";
 import isSafe from "./isSafe";
+import getFinalDecision from './getFinalDecision'
 
 const getHeuristicPointHider = (
   nextNode,
@@ -426,19 +427,10 @@ const getDecisionHider = (finder, currentNode, grid, maxRow, maxCol) => {
     }
   });
   // arrange decision queue  in order of priority vision heuristic point, euclid distance, number of visited times respectively
-  const sortedDecision = decisionQueue
-    .sort((item1, item2) =>
-      item1[4] < item2[4] ? 1 : item1[4] > item2[4] ? -1 : 0
-    )
-    .sort((item1, item2) =>
-      item1[2] > item2[2] ? 1 : item1[2] < item2[2] ? -1 : 0
-    )
-    .sort((item1, item2) =>
-      item1[3] > item2[3] ? 1 : item1[3] < item2[3] ? -1 : 0
-    );
-  //
+  
   // console.log(sortedDecision);
-  const finalDecision = sortedDecision[decisionQueue.length - 1];
+  const finalDecision = getFinalDecision(decisionQueue, [3, 2, 4])
+  
   // choose the best option after sorted
   return finalDecision;
 };
